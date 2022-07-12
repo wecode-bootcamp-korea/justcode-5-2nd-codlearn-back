@@ -3,7 +3,7 @@ CREATE TABLE classes (
     class_name VARCHAR(100)not null,
     instructor_id int not null,
     price float,
-    discounted_price float, 
+    discounted_price float DEFAULT NULL, 
     img varchar(1000),
     rate float,
     description text,
