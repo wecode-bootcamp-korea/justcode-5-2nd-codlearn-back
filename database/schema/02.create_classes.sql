@@ -3,12 +3,12 @@ CREATE TABLE classes (
     class_name VARCHAR(100)not null,
     instructor_id int not null,
     price float,
-    main_img varchar(1000),
+    discounted_price float, 
+    img varchar(1000),
     rate float,
     description text,
     students int,
     sessions int,
-    price_scope int,
     category1_id int,
     category2_id int,
     category3_id int,
@@ -20,6 +20,5 @@ CREATE TABLE classes (
     FOREIGN KEY(category2_id)references category(id),
     FOREIGN KEY(category3_id)references category(id),
     FOREIGN KEY(level_id)references level(id),
-    FOREIGN KEY(price_scope)references price_scope(id),
     FOREIGN KEY(instructor_id)references instructor(id)
 )
