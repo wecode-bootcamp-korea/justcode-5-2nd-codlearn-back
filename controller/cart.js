@@ -1,11 +1,27 @@
-const {} = require('../services/cart');
+const { getCartItems, addToCart, deleteFromCart } = require('../services/cart');
 
-const readCartItems = async (req, res) => {
+const getCartItemsController = async (req, res) => {
   const userId = req.params.id;
-  const items = await cart.readCartItems(userId);
-  console.log('userId: ', userId);
-  console.log('items: ', items);
-  return res.status(200).json(items);
+  const items = await getCartItems(userId);
+  return res.status(200).json({ data: items });
 };
 
-module.exports = { readCartItems };
+const addCartItemController = async (req, res) => {
+  const userId = req.params.id;
+  const classId = req.query.classId;
+  await addToCart(userId, classId);
+  return res.status(201).json({ message: 'item added into cart' });
+};
+
+const deleteCartItemController = async (req, res) => {
+  const userId = req.params.id;
+  const classId = req.query.classId;
+  await deleteFromCart(userId, classId);
+  return res.status(201).json({ message: 'item deleted from cart' });
+};
+
+module.exports = {
+  getCartItemsController,
+  addCartItemController,
+  deleteCartItemController,
+};
