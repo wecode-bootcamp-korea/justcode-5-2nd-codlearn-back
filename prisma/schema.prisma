@@ -9,12 +9,13 @@ datasource db {
 
 model users {
   id         Int          @id @default(autoincrement())
-  name       String?      @db.VarChar(50)
+  user_name  String?      @db.VarChar(50)
   email      String       @unique(map: "email") @db.VarChar(100)
   password   String       @db.VarChar(300)
-  img        String?      @db.VarChar(3000)
+  user_img   String?      @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtdz6QQYO7SjHPl-ruRNK-KbfAKhjQEeOAmg&usqp=CAU") @db.VarChar(3000)
   created_at DateTime?    @default(now()) @db.DateTime(0)
   updated_at DateTime?    @db.DateTime(0)
+  cart       cart[]
   my_classes my_classes[]
   review     review[]
   wishlist   wishlist[]
@@ -22,7 +23,7 @@ model users {
 
 model category {
   id                                     Int       @id @default(autoincrement())
-  name                                   String    @db.VarChar(500)
+  category_name                          String    @db.VarChar(500)
   depth                                  Int?
   parent_id                              Int?
   classes_categoryToclasses_category1_id classes[] @relation("categoryToclasses_category1_id")
@@ -30,26 +31,17 @@ model category {
   classes_categoryToclasses_category3_id classes[] @relation("categoryToclasses_category3_id")
 }
 
-model class_img {
-  id       Int     @id @default(autoincrement())
-  url      String  @db.VarChar(1000)
-  class_id Int
-  classes  classes @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "class_img_ibfk_1")
-
-  @@index([class_id], map: "class_id")
-}
-
 model classes {
   id                                      Int          @id @default(autoincrement())
-  name                                    String       @db.VarChar(100)
+  class_name                              String       @db.VarChar(100)
   instructor_id                           Int
   price                                   Float?       @db.Float
+  discounted_price                        Float?       @db.Float
   img                                     String?      @db.VarChar(1000)
   rate                                    Float?       @db.Float
   description                             String?      @db.Text
   students                                Int?
   sessions                                Int?
-  price_scope                             Int?
   category1_id                            Int?
   category2_id                            Int?
   category3_id                            Int?
@@ -59,10 +51,9 @@ model classes {
   category_categoryToclasses_category1_id category?    @relation("categoryToclasses_category1_id", fields: [category1_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_1")
   category_categoryToclasses_category2_id category?    @relation("categoryToclasses_category2_id", fields: [category2_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_2")
   category_categoryToclasses_category3_id category?    @relation("categoryToclasses_category3_id", fields: [category3_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_3")
-  instructor                              instructor   @relation(fields: [instructor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_6")
+  instructor                              instructor   @relation(fields: [instructor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_5")
   level                                   level?       @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_4")
-  price_scope_classesToprice_scope        price_scope? @relation(fields: [price_scope], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_5")
-  class_img                               class_img[]
+  cart                                    cart[]
   contents                                contents[]
   my_classes                              my_classes[]
   review                                  review[]
@@ -73,7 +64,6 @@ model classes {
   @@index([category3_id], map: "category3_id")
   @@index([instructor_id], map: "instructor_id")
   @@index([level_id], map: "level_id")
-  @@index([price_scope], map: "price_scope")
 }
 
 model contents {
@@ -86,9 +76,9 @@ model contents {
 }
 
 model instructor {
-  id      Int       @id @default(autoincrement())
-  name    String    @db.VarChar(100)
-  classes classes[]
+  id              Int       @id @default(autoincrement())
+  instructor_name String    @db.VarChar(100)
+  classes         classes[]
 }
 
 model level {
@@ -98,41 +88,54 @@ model level {
 }
 
 model my_classes {
-  id       Int     @id @default(autoincrement())
-  user_id  Int
-  class_id Int
-  progress Int     @default(1)
-  classes  classes @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "my_classes_ibfk_2")
-  users    users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "my_classes_ibfk_1")
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  class_id   Int
+  progress   Int       @default(0)
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  classes    classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "my_classes_ibfk_2")
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "my_classes_ibfk_1")
 
   @@index([class_id], map: "class_id")
   @@index([user_id], map: "user_id")
-}
-
-model price_scope {
-  id      Int       @id @default(autoincrement())
-  scope   String?   @db.VarChar(300)
-  classes classes[]
 }
 
 model review {
-  id       Int     @id @default(autoincrement())
-  user_id  Int
-  rate     Float   @db.Float
-  class_id Int
-  classes  classes @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_2")
-  users    users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_1")
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  parent_id      Int?
+  rate           Float    @db.Float
+  class_id       Int
+  review_content String?  @db.Text
+  classes        classes  @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_2")
+  review         review?  @relation("reviewToreview_parent_id", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_3")
+  users          users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_1")
+  other_review   review[] @relation("reviewToreview_parent_id")
+
+  @@index([class_id], map: "class_id")
+  @@index([user_id], map: "user_id")
+  @@index([parent_id], map: "parent_id")
+}
+
+model wishlist {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  class_id   Int
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  classes    classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlist_ibfk_2")
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlist_ibfk_1")
 
   @@index([class_id], map: "class_id")
   @@index([user_id], map: "user_id")
 }
 
-model wishlist {
-  id       Int     @id @default(autoincrement())
-  user_id  Int
-  class_id Int
-  classes  classes @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlist_ibfk_2")
-  users    users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlist_ibfk_1")
+model cart {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  class_id   Int
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  classes    classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cart_ibfk_2")
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cart_ibfk_1")
 
   @@index([class_id], map: "class_id")
   @@index([user_id], map: "user_id")
