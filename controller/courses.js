@@ -1,9 +1,8 @@
-const {readClassesListByCategory} = require('../models/courses');
+const {readClassesList, readClassesListByCategory1, readClassesListByCategory2} = require('../models/courses');
 
-const readCoursesListByCategory = async (req, res) => {
+const readCoursesList = async (req, res) => {
   try {
-   
-    const coursesList = await readClassesListByCategory(
+    const coursesList = await readClassesList(category
     );
     return res.status(200).json(coursesList);
   } catch (err) {
@@ -11,6 +10,30 @@ const readCoursesListByCategory = async (req, res) => {
   }
 };
 
+const readCoursesListByCategory1 = async (req,res) => {
+    
+    try {
+        const { category } = req.params;
+        const coursesList = await readClassesListByCategory1(category);
+    return res.status(200).json(coursesList);
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ message: err.message });
+  }
+
+};
+
+const readCoursesListByCategory2 = async (req,res) => {
+    
+    try {
+        const { category2} = req.params;
+        const coursesList = await readClassesListByCategory2(category2);
+    return res.status(200).json(coursesList);
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ message: err.message });
+  }
+
+};
+
 module.exports = {
-  readCoursesListByCategory,
+  readCoursesList, readCoursesListByCategory1, readCoursesListByCategory2
 };
