@@ -3,8 +3,8 @@ function asyncWrap(asyncController) {
     try {
       await asyncController(req, res);
     } catch (error) {
-      next(error);
       res.status(error.statusCode || 400).json({ message: error.message });
+      //next(error);
     }
   };
 }
