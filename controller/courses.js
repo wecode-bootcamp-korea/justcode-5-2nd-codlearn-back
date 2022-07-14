@@ -2,7 +2,8 @@ const {readClassesList, readClassesListByCategory1, readClassesListByCategory2} 
 
 const readCoursesList = async (req, res) => {
   try {
-    const coursesList = await readClassesList(category
+
+    const coursesList = await readClassesList(
     );
     return res.status(200).json(coursesList);
   } catch (err) {
