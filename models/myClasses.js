@@ -63,10 +63,18 @@ const deleteItem = async (userId, classId) => {
   `;
 };
 
+async function updateItem(classId, progress) {
+  const updatedItem = await prisma.$queryRaw`
+		UPDATE my_classes SET progress = ${progress}
+		WHERE class_id = ${classId}
+	`;
+}
+
 module.exports = {
   readClassIds,
   readClassIdByClassId,
   getItems,
   addItem,
   deleteItem,
+  updateItem,
 };
