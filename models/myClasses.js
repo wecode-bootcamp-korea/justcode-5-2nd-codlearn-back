@@ -58,7 +58,7 @@ const addItem = async (userId, classId) => {
 const deleteItem = async (userId, classId) => {
   await prisma.$queryRaw`
   DELETE FROM my_classes
-  WHERE class_id=${classId.class_id}
+  WHERE user_id=${userId} and class_id=${classId.class_id}
   `;
 };
 
