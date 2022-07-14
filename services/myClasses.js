@@ -1,3 +1,4 @@
+const { objectEnumValues } = require('@prisma/client/runtime');
 const {
   readClassIds,
   readClassIdByClassId,
@@ -16,7 +17,7 @@ const doesExist = async (userId, classList) => {
   const res = classList.filter((el) =>
     items.some((el2) => el2.class_id === el.class_id)
   );
-  return res;
+  return res.map((obj) => obj.class_id);
 };
 
 const doesNotExist = async (userId, classList) => {
@@ -24,7 +25,7 @@ const doesNotExist = async (userId, classList) => {
   const res = classList.filter((el) => {
     return !items.some((el2) => el2.class_id === el.class_id);
   });
-  return res;
+  return res.map((obj) => obj.class_id);
 };
 
 const getMyClassIds = async (userId) => {
@@ -44,8 +45,8 @@ const addToMyClass = async (userId, classList) => {
       await addItem(userId, el.class_id);
     });
   } else {
-    console.log('class exist');
-    const msg = 'CLASS_EXIST: ' + JSON.stringify(classExist);
+    console.log('class already in my classes');
+    const msg = 'CLASS_EXIST: class_id: ' + JSON.stringify(classExist);
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
@@ -55,12 +56,11 @@ const addToMyClass = async (userId, classList) => {
 const deleteFromMyClass = async (userId, classList) => {
   const classNotExist = await doesNotExist(userId, classList);
   if (classNotExist.length === 0) {
-    console.log('can delete');
     classList.forEach(async (classId) => {
       await deleteItem(userId, classId);
     });
   } else {
-    console.log('class is not in cart');
+    console.log('class is not in my classes');
     const msg = 'CLASS_NOT_FOUND: ' + JSON.stringify(classNotExist);
     const error = new Error(msg);
     error.statusCode = 400;

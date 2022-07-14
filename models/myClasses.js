@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 const readClassIds = async (userId) => {
   const classIds = await prisma.$queryRaw`
 		SELECT class_id FROM my_classes
+    WHERE user_id=${userId}
 		ORDER BY class_id
 	`;
   return classIds;
