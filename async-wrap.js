@@ -4,7 +4,7 @@ function asyncWrap(asyncController) {
       await asyncController(req, res);
     } catch (error) {
       res.status(error.statusCode || 400).json({ message: error.message });
-      //next(error);
+      next(error);
     }
   };
 }
