@@ -1,7 +1,9 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function readClassesList() {
+async function readClassesList(pageNum) {
+    
+    const start = (pageNum -1) * 16;
     const classesList = await prisma.$queryRawUnsafe(`
     SELECT
         classes.class_name,
@@ -12,23 +14,26 @@ async function readClassesList() {
         classes.img,
         classes.students,
         classes.description,
+        level.level,
         JSON_ARRAY(
         c1.category_name,
         c2.category_name,
         c3.category_name) AS categories
     FROM classes
+        JOIN level on level.id = classes.level_id
         JOIN instructor on instructor.id = classes.instructor_id
         Join category c1 on c1.id = classes.category1_id
         Join category c2 on c2.id = classes.category2_id
         Join category c3 on c3.id = classes.category3_id
-    limit 16 
+    limit ${start}, 16
     `);
 
     return classesList;
 }
 
-async function readClassesListByCategory1(category){
+async function readClassesListByCategory1(category,pageNum){
     var categoryID = categoryTransform1(category);
+    const start = (pageNum -1) * 16;
     const classesList = await prisma.$queryRawUnsafe(`
     SELECT
         classes.class_name,
@@ -39,23 +44,26 @@ async function readClassesListByCategory1(category){
         classes.img,
         classes.students,
         classes.description,
+        level.level,
         JSON_ARRAY(
         c1.category_name,
         c2.category_name,
         c3.category_name) AS categories
     FROM classes
+        JOIN level on level.id = classes.level_id
         JOIN instructor on instructor.id = classes.instructor_id
         Join category c1 on c1.id = classes.category1_id
         Join category c2 on c2.id = classes.category2_id
         Join category c3 on c3.id = classes.category3_id
     WHERE category1_id = ${categoryID}
-    limit 16 
+    limit ${start},16
     `);
     return classesList;
 
 }
-async function readClassesListByCategory2(category2) {
+async function readClassesListByCategory2(category2,pageNum) {
     var categoryID2 = categoryTransform2(category2);
+    const start = (pageNum -1) * 16;
     const classesList = await prisma.$queryRawUnsafe(`
     SELECT
         classes.class_name,
@@ -66,17 +74,19 @@ async function readClassesListByCategory2(category2) {
         classes.img,
         classes.students,
         classes.description,
+        level.level,
         JSON_ARRAY(
         c1.category_name,
         c2.category_name,
         c3.category_name) AS categories
     FROM classes
+        JOIN level on level.id = classes.level_id
         JOIN instructor on instructor.id = classes.instructor_id
         Join category c1 on c1.id = classes.category1_id
         Join category c2 on c2.id = classes.category2_id
         Join category c3 on c3.id = classes.category3_id
     WHERE classes.category2_id = ${categoryID2}
-    limit 16 
+    limit ${start}, 16
     `);
     return classesList;
 
