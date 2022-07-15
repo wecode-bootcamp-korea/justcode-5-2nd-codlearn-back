@@ -67,25 +67,3 @@ async function getItems(userId) {
 }
 
 module.exports = { checkMyClassItem, getItems };
-
-// select user_id, user_name,
-// 	json_arrayagg(json_array(class_id, class_name, instructor_name, progress, created_at, img)) classes from my_classes
-// join (select id as cindx, class_name, instructor_id, img from classes) classes on classes.cindx = my_classes.class_id
-// join (select id as insidx, instructor_name from instructor) instructor on classes.instructor_id=instructor.insidx
-// join (select id as uidx, user_name from users) user on my_classes.user_id=user.uidx
-// group by user_id;
-
-// select user_id, user_name, json_array(class_id, class_name, instructor_name, progress, created_at, img) class from my_classes
-// join (select id as cindx, class_name, instructor_id, img from classes) classes on classes.cindx = my_classes.class_id
-// join (select id as insidx, instructor_name from instructor) instructor on classes.instructor_id=instructor.insidx
-// join (select id as uidx, user_name from users) user on my_classes.user_id=user.uidx;
-
-// const item = await prisma.$queryRaw`
-// SELECT user_id, user_name, JSON_OBJECTAGG(class_id, json_array(class_name, instructor_name, progress, created_at, img)) class from my_classes
-// join (select id as cindx, class_name, instructor_id, img from classes order by id) classes on classes.cindx = my_classes.class_id
-// join (select id as insidx, instructor_name from instructor) instructor on classes.instructor_id=instructor.insidx
-// join (select id as uidx, user_name from users) user on my_classes.user_id=user.uidx
-// where user_id=1
-// group by user_id
-// `;
-// return item;
