@@ -2,7 +2,7 @@ const express = require('express');
 const cartRouter = require('./cart');
 const myClassRouter = require('./myClasses');
 const coursesRouter = require('./courses');
-const dashBoardRouter = require('./dashBoard');
+const dashBoardRouter = require('./dashboard');
 
 const router = express.Router();
 

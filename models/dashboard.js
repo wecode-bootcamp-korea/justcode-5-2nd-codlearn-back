@@ -1,8 +1,26 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function getItem(userId) {
-  const item = await prisma.$queryRaw`
+async function checkMyClassItem(userId) {
+  const doesExist = await prisma.$queryRaw`
+	SELECT EXISTS (SELECT 1 FROM my_classes where user_id=${userId});
+	`;
+  return doesExist;
+}
+
+async function getUser(userId) {
+  const user = await prisma.$queryRaw`
+		SELECT 
+			JSON_OBJECT(
+				'id', id, 'name', user_name, 'email', email
+			) FROM 
+					users
+				WHERE id=${userId};
+	`;
+}
+
+async function getItems(userId) {
+  const items = await prisma.$queryRawUnsafe`
 		SELECT 
 			JSON_OBJECT('id', my_classes.user_id, 'name', users.user_name, 'email', email) user,
 			JSON_ARRAYAGG(
@@ -45,10 +63,10 @@ async function getItem(userId) {
 		) recent ON recent.user_id = users.id
 			GROUP BY recent.user_id
 	`;
-  return item;
+  return items;
 }
 
-module.exports = { getItem };
+module.exports = { checkMyClassItem, getItems };
 
 // select user_id, user_name,
 // 	json_arrayagg(json_array(class_id, class_name, instructor_name, progress, created_at, img)) classes from my_classes
