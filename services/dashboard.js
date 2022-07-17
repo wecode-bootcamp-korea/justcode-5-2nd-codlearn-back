@@ -20,7 +20,7 @@ const getDashBoardItems = async (userId) => {
   let recentlyRegistered;
   let recentlyTaken;
   let wishlist;
-  if (isMyCourseNotEmpty) {
+  if (isMyCourseNotEmpty(userId)) {
     recentlyRegistered = {
       recentlyRegistered: await getCoursesBySort(userId, 'created_at', limit),
     };
@@ -28,7 +28,7 @@ const getDashBoardItems = async (userId) => {
       recentlyTaken: await getCoursesBySort(userId, 'progress', limit),
     };
   }
-  if (isWishListNotEmpty) {
+  if (isWishListNotEmpty(userId)) {
     wishlist = { wishlist: await getWishListItems(userId, limit) };
   }
   const result = Object.assign(
