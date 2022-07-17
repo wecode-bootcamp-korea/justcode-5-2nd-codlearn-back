@@ -22,7 +22,7 @@ const addToWishList = async (userId, classId) => {
     await addItem(userId, classId);
   } else {
     console.log('class already in wishlist');
-    const msg = 'CLASS_EXIST: class_id=' + classId;
+    const msg = 'CLASS_EXIST: class_id: ' + classId;
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
@@ -36,7 +36,7 @@ const deleteFromWishlist = async (userId, classId) => {
     await deleteItem(userId, classId);
   } else {
     console.log('class is not in wishlist');
-    const msg = 'CLASS_NOT_FOUND: class_id=' + classId;
+    const msg = 'CLASS_NOT_FOUND: class_id: ' + classId;
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
