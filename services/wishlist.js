@@ -13,18 +13,16 @@ const isWishListNotEmpty = async (userId) => {
 };
 
 const getWishList = async (userId) => {
-  return isWishListNotEmpty ? await getItems(userId, limit) : {};
+  return isWishListNotEmpty(userId) ? await getItems(userId, limit) : {};
 };
 
 const addToWishList = async (userId, classId) => {
   const classExist = await checkWishlistHasClass(userId, classId);
-  console.log('classExist= ', classExist, ' ? ', !classExist);
   if (!classExist) {
-    console.log('not exist');
     await addItem(userId, classId);
   } else {
     console.log('class already in wishlist');
-    const msg = 'CLASS_EXIST: class_id: ' + JSON.stringify(`${classId}`);
+    const msg = 'CLASS_EXIST: class_id=' + classId;
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
@@ -33,11 +31,12 @@ const addToWishList = async (userId, classId) => {
 
 const deleteFromWishlist = async (userId, classId) => {
   const classExist = await checkWishlistHasClass(userId, classId);
+  console.log('classExist ', classExist);
   if (classExist) {
     await deleteItem(userId, classId);
   } else {
     console.log('class is not in wishlist');
-    const msg = 'CLASS_NOT_FOUND: ' + JSON.stringify(`${classId}`);
+    const msg = 'CLASS_NOT_FOUND: class_id=' + classId;
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;

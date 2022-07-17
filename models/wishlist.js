@@ -14,7 +14,7 @@ const checkWishlistHasClass = async (userId, classId) => {
   const [isExist] = await prisma.$queryRaw`
   	SELECT EXISTS (SELECT 1 FROM wishlist where user_id=${userId} AND class_id = ${classId}) wishlist
 `;
-  return isExist.wishlist === '1n' ? true : false;
+  return /^1/.test(isExist.wishlist);
 };
 
 async function getItems(userId, limit) {
@@ -39,7 +39,7 @@ const addItem = async (userId, classId) => {
 const deleteItem = async (userId, classId) => {
   await prisma.$queryRaw`
   DELETE FROM wishlist
-  WHERE user_id=${userId} and class_id=${classId.class_id}
+  WHERE user_id=${userId} and class_id=${classId}
   `;
 };
 

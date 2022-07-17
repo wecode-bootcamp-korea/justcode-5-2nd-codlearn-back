@@ -21,7 +21,7 @@ const deleteWishListItemController = async (req, res) => {
   const userId = req.params.id;
   const classId = req.query.classId;
   await deleteFromWishlist(userId, classId);
-  return res.status(201).json({ message: 'item added into wishlist' });
+  return res.status(201).json({ message: 'item deleted from wishlist' });
 };
 
 module.exports = {

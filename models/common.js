@@ -3,10 +3,9 @@ const prisma = new PrismaClient();
 
 async function checkTableNotEmpty(userId, table) {
   const [isNotEmpty] = await prisma.$queryRawUnsafe(`
-		@option=${table}
-		SELECT EXISTS (SELECT 1 FROM @table where user_id=${userId}) item
+		SELECT EXISTS (SELECT 1 FROM ${table} where user_id=${userId}) item
 	`);
-  return isNotEmpty.item === '1n' ? true : false;
+  return /^1/.test(isNotEmpty.dashboard);
 }
 
 const readClassIdByClassId = async (userId, classId, table) => {
