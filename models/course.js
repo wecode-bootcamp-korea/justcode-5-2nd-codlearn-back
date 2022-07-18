@@ -17,7 +17,7 @@ async function getCourseDetail(titleID) {
         (select
             JSON_ARRAYAGG(JSON_OBJECT("cotent",contents.content))
             from contents
-        where contents.class_id = 1) AS contents,
+        where contents.class_id =${titleID} ) AS contents,
         JSON_ARRAY(
         c1.category_name,
         c2.category_name,
