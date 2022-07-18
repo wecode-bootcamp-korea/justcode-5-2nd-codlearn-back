@@ -18,7 +18,6 @@ const isClassListInputValid = classList => {
 };
 
 const isInputValid = (input, str) => {
-  console.log('isvalid ', str, ' ', input);
   if (input == null || input === '') {
     console.log(`INVALID_INPUT: ${str} = undefined or null`);
     return false;
