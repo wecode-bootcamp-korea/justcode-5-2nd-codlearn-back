@@ -6,7 +6,7 @@ async function readClassesList(pageNum, level, price) {
   const start = (pageNum - 1) * 16;
   const condition = {
     'classes.level_id': level,
-    'classes.price': price,
+    'classes.price': charge,
   };
   const query = `
 SELECT
@@ -42,7 +42,7 @@ async function readClassesListByCategory1(category, pageNum,level, price) {
   const start = (pageNum - 1) * 16;
   const condition = {
     'classes.level_id': level,
-    'classes.price': price,
+    'classes.price': charge,
   };
   let query = `
   SELECT
@@ -80,7 +80,7 @@ async function readClassesListByCategory2(category2, pageNum,level,price) {
   const start = (pageNum - 1) * 16;
   const condition = {
     'classes.level_id': level,
-    'classes.price': price,
+    'classes.price': charge,
   };
   const query = ` SELECT
     classes.class_name,
