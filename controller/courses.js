@@ -16,10 +16,10 @@ const readCoursesList = async (req, res) => {
     const price = priceQuery.split(',').filter(value => value != '');
     const sort = req.query.order; 
     const coursesList = await readClassesList(pageNum, level, price,sort);
-    const page = await getTotalPages(pageNum,level,price);
-    const object ={page:page};
+    const pageList= await getTotalPages(pageNum,level,price);
+    const page = pageList[0];
     const object2 ={data:coursesList};
-    const result = Object.assign(object, object2);
+    const result = Object.assign(page, object2);
     return res.status(200).json(result);
    
 
@@ -37,11 +37,11 @@ const readCoursesListByCategory1 = async (req, res) => {
     const priceQuery = req.query.charge || '';
     const price = priceQuery.split(',').filter(value => value != '');
     const sort = req.query.order; 
-    const page = await getTotalPages1(category, level,price);
+    const pageList = await getTotalPages1(category, level,price);
+    const page = pageList[0];
     const coursesList = await readClassesListByCategory1(category, pageNum,level, price,sort);
-    const object ={page:page};
     const object2 ={data:coursesList};
-    const result = Object.assign(object, object2);
+    const result = Object.assign(page, object2);
     return res.status(200).json(result);
   } catch (err) {
     res.status(err.statusCode || 500).json({ message: err.message });
@@ -56,12 +56,12 @@ const readCoursesListByCategory2 = async (req, res) => {
     const level = levelQuery.split(',').filter(value => value != '');
     const priceQuery = req.query.charge || '';
     const price = priceQuery.split(',').filter(value => value != '');
-    const page = await getTotalPages2(category2,level,price);
+    const pageList = await getTotalPages2(category2,level,price);
+    const page = pageList[0];
     const sort = req.query.order; 
     const coursesList = await readClassesListByCategory2(category2, pageNum,level,price,sort);
-    const object ={page:page};
     const object2 ={data:coursesList};
-    const result = Object.assign(object, object2);
+    const result = Object.assign(page, object2);
     return res.status(200).json(result);
   } catch (err) {
     res.status(err.statusCode || 500).json({ message: err.message });
