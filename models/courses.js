@@ -10,6 +10,7 @@ async function readClassesList(pageNum, level, price) {
   };
   const query = `
 SELECT
+    classes.id,
     classes.class_name,
     instructor.instructor_name,
     classes.rate,
@@ -46,6 +47,7 @@ async function readClassesListByCategory1(category, pageNum, level, price) {
   };
   let query = `
   SELECT
+      classes.id,
       classes.class_name,
       instructor.instructor_name,
       classes.rate,
@@ -81,6 +83,7 @@ async function readClassesListByCategory2(category2, pageNum, level, price) {
     'classes.price': price,
   };
   const query = ` SELECT
+    classes.id,
     classes.class_name,
     instructor.instructor_name,
     classes.rate,
