@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { whereAnd, whereAnd2 } = require('./util');
 
-async function readClassesList(pageNum, level, price) {
+async function readClassesList(pageNum, level, price, sort) {
   const start = (pageNum - 1) * 16;
   const condition = {
     'classes.level_id': level,
@@ -31,14 +31,23 @@ FROM classes
     Join category c2 on c2.id = classes.category2_id
     Join category c3 on c3.id = classes.category3_id
 ${whereAnd(condition)}
-${start ? `limit ${start}, 16` : ``}
+${sort === 'famous' ? `order by students DESC ` : ``}
+${sort === 'rating' ? `order by rate DESC` : ``}
+${sort === 'default' ? `` : ``}
+${start ? `limit ${start}, 16` : `limit 0,16`}
 `;
   const classesList = await prisma.$queryRawUnsafe(query);
 
   return classesList;
 }
 
-async function readClassesListByCategory1(category, pageNum,level, price) {
+async function readClassesListByCategory1(
+  category,
+  pageNum,
+  level,
+  price,
+  sort
+) {
   var categoryID = categoryTransform1(category);
   const start = (pageNum - 1) * 16;
   const condition = {
@@ -69,15 +78,22 @@ async function readClassesListByCategory1(category, pageNum,level, price) {
       Join category c3 on c3.id = classes.category3_id
   WHERE category1_id = ${categoryID}
   ${whereAnd2(condition)}
-  ${start ? `limit ${start}, 16` : ``}
+  ${sort === 'famous' ? `order by students DESC ` : ``}
+  ${sort === 'rating' ? `order by rate DESC` : ``}
+  ${sort === 'default' ? `` : ``}
+  ${start ? `limit ${start}, 16` : `limit 0,16`}
   `;
   console.log(query);
-  const classesList = await prisma.$queryRawUnsafe(
-      query
-  );
+  const classesList = await prisma.$queryRawUnsafe(query);
   return classesList;
 }
-async function readClassesListByCategory2(category2, pageNum,level,price) {
+async function readClassesListByCategory2(
+  category2,
+  pageNum,
+  level,
+  price,
+  sort
+) {
   var categoryID2 = categoryTransform2(category2);
   const start = (pageNum - 1) * 16;
   const condition = {
@@ -107,7 +123,10 @@ FROM classes
     Join category c3 on c3.id = classes.category3_id
 WHERE classes.category2_id = ${categoryID2}
 ${whereAnd2(condition)}
-${start ? `limit ${start}, 16` : ``}
+${sort === 'famous' ? `order by students DESC ` : ``}
+${sort === 'rating' ? `order by rate DESC` : ``}
+${sort === 'default' ? `` : ``}
+${start ? `limit ${start}, 16` : `limit 0,16`}
 `;
   console.log(query);
   const classesList = await prisma.$queryRawUnsafe(query);
@@ -150,9 +169,72 @@ function categoryTransform2(category) {
 
   return result;
 }
+async function getTotalPages(pageNum, level, price) {
+  const condition = {
+    'classes.level_id': level,
+    'classes.price': price,
+  };
+
+  const query = `SELECT CEIL(count(*)/16) AS pages
+    from classes
+    JOIN level on level.id = classes.level_id
+    JOIN instructor on instructor.id = classes.instructor_id
+    Join category c1 on c1.id = classes.category1_id
+    Join category c2 on c2.id = classes.category2_id
+    Join category c3 on c3.id = classes.category3_id
+${whereAnd(condition)} `;
+
+  const totalPage = await prisma.$queryRawUnsafe(query);
+  return totalPage;
+}
+
+async function getTotalPages1(category, level, price) {
+  var categoryID = categoryTransform1(category);
+  const condition = {
+    'classes.level_id': level,
+    'classes.price': price,
+  };
+
+  const query = `SELECT CEIL(count(*)/16) AS pages
+    from classes
+    JOIN level on level.id = classes.level_id
+    JOIN instructor on instructor.id = classes.instructor_id
+    Join category c1 on c1.id = classes.category1_id
+    Join category c2 on c2.id = classes.category2_id
+    Join category c3 on c3.id = classes.category3_id
+    WHERE category1_id = ${categoryID}
+${whereAnd(condition)} `;
+
+  const totalPage = await prisma.$queryRawUnsafe(query);
+  return totalPage;
+}
+
+async function getTotalPages2(category2, level, price) {
+  var categoryID = categoryTransform2(category2);
+  const condition = {
+    'classes.level_id': level,
+    'classes.price': price,
+  };
+
+  const query = `SELECT CEIL(count(*)/16) AS pages
+    from classes
+    JOIN level on level.id = classes.level_id
+    JOIN instructor on instructor.id = classes.instructor_id
+    Join category c1 on c1.id = classes.category1_id
+    Join category c2 on c2.id = classes.category2_id
+    Join category c3 on c3.id = classes.category3_id
+    WHERE category2_id = ${categoryID}
+${whereAnd(condition)} `;
+
+  const totalPage = await prisma.$queryRawUnsafe(query);
+  return totalPage;
+}
 
 module.exports = {
   readClassesList,
   readClassesListByCategory1,
   readClassesListByCategory2,
+  getTotalPages,
+  getTotalPages1,
+  getTotalPages2,
 };
