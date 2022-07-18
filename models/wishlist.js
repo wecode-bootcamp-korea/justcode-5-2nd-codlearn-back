@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const readClassIds = async (userId) => {
+const readClassIds = async userId => {
   const classIds = await prisma.$queryRaw`
 		SELECT class_id FROM cart
     WHERE user_id=${userId}
@@ -12,17 +12,24 @@ const readClassIds = async (userId) => {
 
 const checkWishlistHasClass = async (userId, classId) => {
   const [isExist] = await prisma.$queryRaw`
-  	SELECT EXISTS (SELECT 1 FROM wishlist where user_id=${userId} AND class_id = ${classId}) wishlist
+  	SELECT EXISTS (
+      SELECT 1 FROM wishlist where user_id=${userId} AND class_id = ${classId}
+    ) wishlist
 `;
   return /^1/.test(isExist.wishlist);
 };
 
 async function getItems(userId, limit) {
   const items = await prisma.$queryRaw`
-		SELECT wishlist.class_id, classes.class_name, img, wishlist.created_at from wishlist
+		SELECT
+      wishlist.class_id,
+      classes.class_name,
+      img,
+      wishlist.created_at 
+    FROM wishlist
 		JOIN classes on wishlist.class_id = classes.id
-		where wishlist.user_id=${userId}  
-		order by wishlist.created_at DESC limit ${limit}
+		WHERE wishlist.user_id=${userId}  
+		ORDER BY wishlist.created_at DESC limit ${limit}
 	`;
   return items;
 }

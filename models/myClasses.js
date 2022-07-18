@@ -1,23 +1,27 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const readClassIds = async (userId) => {
+const readClassIds = async userId => {
   const classIds = await prisma.$queryRaw`
-		SELECT class_id FROM my_classes
+    SELECT
+      class_id
+    FROM my_classes
     WHERE user_id=${userId}
-		ORDER BY class_id
-	`;
+    ORDER BY class_id
+  `;
   return classIds;
 };
 
 const readClassIdByClassId = async (userId, classId) => {
   const item = await prisma.$queryRaw`
-  SELECT class_id FROM my_classes
-  WHERE
-  user_id = ${userId}
-  AND
-  class_id = ${classId}
-`;
+    SELECT
+      class_id
+    FROM my_classes
+    WHERE
+    user_id = ${userId}
+    AND
+    class_id = ${classId}
+  `;
   return item;
 };
 
@@ -29,20 +33,37 @@ const orderBy = (sort, order) => {
 
 async function getItems(userId, sort) {
   if (!sort) sort = `created_at`;
+  sort = sort.toLowerCase();
   const items = await prisma.$queryRaw`
-	SELECT
-	id, class_id, class_name, progress, img as class_img, instructor_name, created_at
-	FROM
-	(SELECT * FROM my_classes
-	JOIN (SELECT id as cidx, class_name, instructor_id, img FROM classes) classes 
-	ON class_id = classes.cidx
-	JOIN (SELECT id as insidx, instructor_name FROM instructor) instructor
-	ON classes.instructor_id = instructor.insidx)
-	as t
-	WHERE t.user_id = ${userId}
-	ORDER BY 
-		CASE WHEN ${sort} = 'created_at' then created_at end DESC,
-		CASE WHEN ${sort} = 'class_name' then class_name end ASC
+    SELECT
+      id,
+      class_id,
+      class_name,
+      progress,
+      img as class_img,
+      instructor_name,
+      created_at
+    FROM (
+      SELECT * FROM my_classes
+        JOIN(
+          SELECT
+            id as cidx,
+            class_name,
+            instructor_id,
+            img FROM classes
+          ) classes ON class_id = classes.cidx
+        JOIN(
+          SELECT
+            id as insidx,
+            instructor_name
+          FROM instructor
+          ) instructor ON classes.instructor_id = instructor.insidx
+      ) as t
+    WHERE t.user_id = ${userId}
+    ORDER BY
+      CASE WHEN ${sort} = 'created_at' then created_at end DESC,
+      CASE WHEN ${sort} = 'class_name' then class_name end ASC,
+      CASE WHEN ${sort} = 'progress' then progress end DESC
   `;
   return items;
 }
@@ -52,22 +73,22 @@ const addItem = async (userId, classId) => {
     INSERT INTO my_classes
     (user_id, class_id)
     VALUES
-		(${userId}, ${classId})
+    (${userId}, ${classId})
   `;
 };
 
 const deleteItem = async (userId, classId) => {
   await prisma.$queryRaw`
-  DELETE FROM my_classes
-  WHERE user_id=${userId} and class_id=${classId.class_id}
+    DELETE FROM my_classes
+    WHERE user_id=${userId} AND class_id=${classId.class_id}
   `;
 };
 
-async function updateItem(classId, progress) {
-  const updatedItem = await prisma.$queryRaw`
-		UPDATE my_classes SET progress = ${progress}
-		WHERE class_id = ${classId}
-	`;
+async function updateItem(userId, classId, progress) {
+  await prisma.$queryRaw`
+    UPDATE my_classes SET progress = ${progress}
+    WHERE user_id=${userId} AND class_id = ${classId}
+  `;
 }
 
 module.exports = {

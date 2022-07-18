@@ -37,7 +37,7 @@ ${start ? `limit ${start}, 16` : ``}
   return classesList;
 }
 
-async function readClassesListByCategory1(category, pageNum,level, price) {
+async function readClassesListByCategory1(category, pageNum, level, price) {
   var categoryID = categoryTransform1(category);
   const start = (pageNum - 1) * 16;
   const condition = {
@@ -70,12 +70,10 @@ async function readClassesListByCategory1(category, pageNum,level, price) {
   ${start ? `limit ${start}, 16` : ``}
   `;
   console.log(query);
-  const classesList = await prisma.$queryRawUnsafe(
-      query
-  );
+  const classesList = await prisma.$queryRawUnsafe(query);
   return classesList;
 }
-async function readClassesListByCategory2(category2, pageNum,level,price) {
+async function readClassesListByCategory2(category2, pageNum, level, price) {
   var categoryID2 = categoryTransform2(category2);
   const start = (pageNum - 1) * 16;
   const condition = {

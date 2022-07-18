@@ -35,8 +35,11 @@ const deleteMyClassItemController = async (req, res) => {
   return res.status(201).json({ message: 'item deleted from cart' });
 };
 
+const updateMyClassItemsController = async (req, res) => {};
+
 module.exports = {
   getMyClassItemsController,
   addMyClassItemsController,
   deleteMyClassItemController,
+  updateMyClassItemsController,
 };
