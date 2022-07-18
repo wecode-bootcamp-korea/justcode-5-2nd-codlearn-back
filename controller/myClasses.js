@@ -21,11 +21,13 @@ const addMyClassItemsController = async (req, res) => {
 const deleteMyClassItemController = async (req, res) => {
   const userId = req.params.id;
   const tempClassList = req.query.classId;
+  let arr = [];
   let classList = [];
   if (Array.isArray(tempClassList)) {
     tempClassList.map((el) => {
-      classList = [...classList, { class_id: Number(el) }];
+      arr = [...arr, { class_id: Number(el) }];
     });
+    classList = Array.from(new Set(arr));
   } else {
     classList = [{ class_id: Number(tempClassList) }];
   }

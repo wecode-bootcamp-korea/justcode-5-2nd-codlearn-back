@@ -9,7 +9,7 @@ const {
 } = require('../controller/cart');
 
 router.get('/:id', asyncWrap(getCartItemsController));
-router.put('/:id/add', asyncWrap(addCartItemController));
-router.delete('/:id/delete', asyncWrap(deleteCartItemController));
+router.put('/:id', asyncWrap(addCartItemController));
+router.delete('/:id', asyncWrap(deleteCartItemController));
 
 module.exports = router;
