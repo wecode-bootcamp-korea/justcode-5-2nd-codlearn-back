@@ -5,7 +5,7 @@ const coursesRouter = require('./courses');
 const courseRouter = require('./course');
 const dashBoardRouter = require('./dashboard');
 const wishlistRouter = require('./wishlist');
-const mainRouter = requrie('./main')
+const mainRouter = require('./main')
 
 const router = express.Router();
 

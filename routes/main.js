@@ -7,7 +7,7 @@ const {
   } = require('../controller/main');
 
 
-router.get('/:title',  asyncWrap(readMainPage));
+router.get('/',  asyncWrap(readMainPage));
 
 
 
