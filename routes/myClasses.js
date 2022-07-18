@@ -11,7 +11,7 @@ const {
 
 router.get('/:id', asyncWrap(getMyClassItemsController));
 router.put('/:id', asyncWrap(addMyClassItemsController));
-router.put('/:id/update', asyncWrap(updateMyClassItemsController));
+router.patch('/update/:id', asyncWrap(updateMyClassItemsController));
 router.delete('/:id', asyncWrap(deleteMyClassItemController));
 
 module.exports = router;

@@ -1,30 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const readClassIds = async userId => {
-  const classIds = await prisma.$queryRaw`
-    SELECT
-      class_id
-    FROM my_classes
-    WHERE user_id=${userId}
-    ORDER BY class_id
-  `;
-  return classIds;
-};
-
-const readClassIdByClassId = async (userId, classId) => {
-  const item = await prisma.$queryRaw`
-    SELECT
-      class_id
-    FROM my_classes
-    WHERE
-    user_id = ${userId}
-    AND
-    class_id = ${classId}
-  `;
-  return item;
-};
-
 const orderBy = (sort, order) => {
   if (!sort) sort = 'created_at';
   if (!order) order = 'DESC';
@@ -50,7 +26,8 @@ async function getItems(userId, sort) {
             id as cidx,
             class_name,
             instructor_id,
-            img FROM classes
+            img
+          FROM classes
           ) classes ON class_id = classes.cidx
         JOIN(
           SELECT
@@ -84,16 +61,14 @@ const deleteItem = async (userId, classId) => {
   `;
 };
 
-async function updateItem(userId, classId, progress) {
-  await prisma.$queryRaw`
-    UPDATE my_classes SET progress = ${progress}
-    WHERE user_id=${userId} AND class_id = ${classId}
-  `;
-}
+const updateItem = async (userId, classId, progress) => {
+  await prisma.$queryRawUnsafe(`
+    UPDATE my_classes SET progress=${progress}
+    WHERE user_id=${userId} AND class_id=${classId}
+  `);
+};
 
 module.exports = {
-  readClassIds,
-  readClassIdByClassId,
   getItems,
   addItem,
   deleteItem,
