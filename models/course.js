@@ -20,7 +20,7 @@ async function getCourseDetail(titleID) {
         c2.category_name,
         c3.category_name) AS categories
     FROM classes
-        JOIN contents on contents.class_id = classes.id
+        JOIN contents on contents.class_id = ${titleID}
         JOIN instructor on instructor.id = classes.instructor_id
         Join category c1 on c1.id = classes.category1_id
         Join category c2 on c2.id = classes.category2_id
