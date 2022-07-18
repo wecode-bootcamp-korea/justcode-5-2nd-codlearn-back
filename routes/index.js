@@ -11,7 +11,7 @@ const router = express.Router();
 router.use('/cart', cartRouter);
 router.use('/my-classes', myClassRouter);
 router.use('/courses', coursesRouter);
-router.use('/course', coursesRouter);
+router.use('/course', courseRouter);
 router.use('/dashboard', dashBoardRouter);
 router.use('/wishlist', wishlistRouter);
 
