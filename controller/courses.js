@@ -9,7 +9,7 @@ const readCoursesList = async (req, res) => {
     const pageNum = req.query.page;
     const levelQuery = req.query.level || '';
     const level = levelQuery.split(',').filter(value => value != '');
-    const priceQuery = req.query.price || '';
+    const priceQuery = req.query.charge || '';
     const price = priceQuery.split(',').filter(value => value != '');
     const coursesList = await readClassesList(pageNum, level, price);
     return res.status(200).json(coursesList);
@@ -24,7 +24,7 @@ const readCoursesListByCategory1 = async (req, res) => {
     const pageNum = req.query.page;
     const levelQuery = req.query.level || '';
     const level = levelQuery.split(',').filter(value => value != '');
-    const priceQuery = req.query.price || '';
+    const priceQuery = req.query.charge || '';
     const price = priceQuery.split(',').filter(value => value != '');
     const coursesList = await readClassesListByCategory1(category, pageNum,level, price);
     return res.status(200).json(coursesList);
@@ -39,7 +39,7 @@ const readCoursesListByCategory2 = async (req, res) => {
     const pageNum = req.query.page;
     const levelQuery = req.query.level || '';
     const level = levelQuery.split(',').filter(value => value != '');
-    const priceQuery = req.query.price || '';
+    const priceQuery = req.query.charge || '';
     const price = priceQuery.split(',').filter(value => value != '');
     const coursesList = await readClassesListByCategory2(category2, pageNum,level,price);
     return res.status(200).json(coursesList);
