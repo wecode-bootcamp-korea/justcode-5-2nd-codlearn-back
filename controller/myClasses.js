@@ -5,13 +5,10 @@ const {
   updateProgressOfMyClass,
 } = require('../services/myClasses');
 
-const isClassListInputValid = classList => {
-  if (classId == null || classId === '') {
+const isClassListInputValid = (classList, str) => {
+  console.log('isClassValid: ', str, ' ', classList);
+  if (classList == null || classList.length === 0 || classList === '') {
     console.log(`INVALID_INPUT: classId=undefined or null`);
-    return false;
-  }
-  if (classId === '') {
-    console.log(`INVALID_INPUT: classId=${classId}`);
     return false;
   }
   return true;
@@ -23,7 +20,13 @@ const isInputValid = (input, str) => {
     return false;
   }
   if (str === 'sort') {
-    if (input !== 'class_name' || input !== 'created_at') {
+    if (
+      !(
+        input == null ||
+        input.toLowerCase() === 'class_name' ||
+        input.toLowerCase() === 'created_at'
+      )
+    ) {
       console.log(`INVALID_INPUT: ${input} is not valid sort option.`);
       return false;
     }
@@ -38,16 +41,11 @@ const isInputValid = (input, str) => {
 const getMyClassItemsController = async (req, res) => {
   const userId = req.params.id;
   const sort = req.query.sort;
-  if (
-    isInputValid(userId, 'userId') &&
-    isInputValid(classId, 'classId') &&
-    isInputValid(sort, 'sort')
-  ) {
+  if (isInputValid(userId, 'userId') && isInputValid(sort, 'sort')) {
     const items = await getMyClassItems(userId, sort);
     return res.status(200).json({ data: items });
   } else {
-    const msg =
-      'INVALID_INPUT: userId, classId, progress MUST HAVE A SINGLE VALUE';
+    const msg = 'INVALID_INPUT: userId, sort option NOT VALID';
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
@@ -57,8 +55,15 @@ const getMyClassItemsController = async (req, res) => {
 const addMyClassItemsController = async (req, res) => {
   const userId = req.params.id;
   const classList = req.body;
-  await addToMyClass(userId, classList);
-  return res.status(201).json({ message: 'class added into my classes' });
+  if (isClassListInputValid(classList, 'classList')) {
+    await addToMyClass(userId, classList);
+    return res.status(201).json({ message: 'class added into my classes' });
+  } else {
+    const msg = 'INVALID_INPUT: classList is NOT VALID';
+    const error = new Error(msg);
+    error.statusCode = 400;
+    throw error;
+  }
 };
 
 const deleteMyClassItemController = async (req, res) => {
