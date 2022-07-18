@@ -6,10 +6,12 @@ const {
   getMyClassItemsController,
   addMyClassItemsController,
   deleteMyClassItemController,
+  updateMyClassItemsController,
 } = require('../controller/myClasses');
 
 router.get('/:id', asyncWrap(getMyClassItemsController));
 router.put('/:id', asyncWrap(addMyClassItemsController));
+router.patch('/update/:id', asyncWrap(updateMyClassItemsController));
 router.delete('/:id', asyncWrap(deleteMyClassItemController));
 
 module.exports = router;
