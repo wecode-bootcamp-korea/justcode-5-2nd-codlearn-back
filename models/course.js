@@ -1,10 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-
-
 async function getCourseDetail(titleID) {
-    const classDetail = await prisma.$queryRawUnsafe(`
+  const classDetail = await prisma.$queryRawUnsafe(`
     SELECT
         classes.class_name,
         instructor.instructor_name,
@@ -15,7 +13,12 @@ async function getCourseDetail(titleID) {
         classes.students,
         classes.description,
         (select
-            JSON_ARRAYAGG(JSON_OBJECT("cotent",contents.content))
+            JSON_ARRAYAGG(json_object("comment", review.review_content, "user", users.user_name, "main", review.parent_id)) as review
+             from review
+             join users on review.user_id = users.id
+        where review.class_id = ${titleID} group by parent_id) AS review, 
+        (select
+            JSON_ARRAYAGG(contents.content)
             from contents
         where contents.class_id =${titleID} ) AS contents,
         JSON_ARRAY(
@@ -30,9 +33,9 @@ async function getCourseDetail(titleID) {
     Where classes.id = ${titleID}
     `);
 
-    return classDetail;
+  return classDetail;
 }
 
 module.exports = {
-   getCourseDetail
+  getCourseDetail,
 };
