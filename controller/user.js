@@ -26,28 +26,31 @@ const requestKaKaoAuthController = async (req, res) => {
     response_type: 'code',
   };
   const searchParams = new URLSearchParams(paramsObj).toString();
-
   const requestURL = `${KAKAO_AUTH_URL}/?${searchParams}`;
   res.redirect(requestURL);
 };
 
-const getKakaoLoginController = async (req, res) => {
+const kakaoTokenController = async (req, res) => {
   const code = req.query.code;
-  const token = await kakaoLogin(code);
-  console.log('token')
-  //res.redicrect('http://localhost:8000/user/kakao/token/callback');
-  res.redirect(`${FRONT_URL}/?token=${accessToken}`);
+  const kakaoToken = await kakaoLogin(code);
+  const accessToken = kakaoToken.data.access_token;
+  res.redirect(`${userInfo}/?token=${accessToken}`);
 };
 
-const getKakaoTokenController = async (req, res) => {
-  //const token = req.body['access_token']
-  const token = process.env.KAKAO_TOKEN;
+const kakaoUserInfoController = async (req, res) => {
+  const userInfo = req.body;
+};
+
+const kakaoLoginController = async (req, res) => {
+  const code = req.query.code;
+  const token = await kakaoLogin(code);
+  console.log('token to front: ', token);
+  res.redirect(`${FRONT_URL}/?token=${token}`);
 };
 
 module.exports = {
   signupController,
   loginController,
   requestKaKaoAuthController,
-  getKakaoLoginController,
-  getKakaoTokenController,
+  kakaoLoginController,
 };

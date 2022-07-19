@@ -138,19 +138,24 @@ const kakaoSignup = async userInfo => {
   await createUser(userInfo, true);
 };
 
+const getKakaoToken = async code => {
+  const kakaoToken = await getKakaoAccessToken(code);
+  const accessToken = kakaoToken.data.access_token;
+  return kakaoToken;
+};
+
 const getUserInfoByKakaoToken = async code => {
   const kakaoToken = await getKakaoAccessToken(code);
   const accessToken = kakaoToken.data.access_token;
   const refreshToken = kakaoToken.data.refresh_token;
 
-  const KakaoUserInfo = await getKakaoUserInfo(accessToken);
-
-  const name = KakaoUserInfo.data.kakao_account.profile_nickname_needs_agreement
-    ? KakaoUserInfo.data.kakao_account.properties.nickname
+  const kakaoUserInfo = await getKakaoUserInfo(accessToken);
+  const name = kakaoUserInfo.data.kakao_account.profile_nickname_needs_agreement
+    ? kakaoUserInfo.data.kakao_account.properties.nickname
     : null;
-  const email = KakaoUserInfo.data.kakao_account.email;
-  const img = KakaoUserInfo.data.kakao_account.profile_image_needs_agreement
-    ? KakaoUserInfo.data.kakao_account.profile.profile_img_url
+  const email = kakaoUserInfo.data.kakao_account.email;
+  const img = kakaoUserInfo.data.kakao_account.profile_image_needs_agreement
+    ? kakaoUserInfo.data.kakao_account.profile.profile_img_url
     : null;
 
   const userInfo = {
@@ -162,11 +167,9 @@ const getUserInfoByKakaoToken = async code => {
 };
 
 const kakaoLogin = async code => {
-  const userInfo = await getKakaoUserInfo(code);
-  console.log('userInfo ', userInfo);
+  const userInfo = await getUserInfoByKakaoToken(code);
 
   const user = await doesUserExist(userInfo.email);
-  console.log('existed user? ', user);
   let userId;
   if (!user) userId = await signup(userInfo, true);
   if (user && user.social) userId = await readUserIdByEmail(userInfo.email);
