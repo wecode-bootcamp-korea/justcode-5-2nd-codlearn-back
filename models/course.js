@@ -6,6 +6,8 @@ async function getCourseDetail(titleID) {
     SELECT
         classes.class_name,
         instructor.instructor_name,
+        classes.discounted_price,
+        classes.sessions,
         level.level,
         classes.rate,
         classes.price,
