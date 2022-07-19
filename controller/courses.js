@@ -55,14 +55,15 @@ const readCoursesListByCategory2 = async (req, res) => {
     const { category2 } = req.params;
     const search = req.query.s; 
     const pageNum = req.query.page;
+    const skill =req.query.skill;
     const levelQuery = req.query.level || '';
     const level = levelQuery.split(',').filter(value => value != '');
     const priceQuery = req.query.charge || '';
     const price = priceQuery.split(',').filter(value => value != '');
-    const pageList = await getTotalPages2(category2,level,price,search);
+    const pageList = await getTotalPages2(category2,level,price,search,skill);
     const page = pageList[0];
     const sort = req.query.order; 
-    const coursesList = await readClassesListByCategory2(category2, pageNum,level,price,sort,search);
+    const coursesList = await readClassesListByCategory2(category2, pageNum,level,price,sort,search,skill);
     const object2 ={data:coursesList};
     const result = Object.assign(page, object2);
     return res.status(200).json(result);
