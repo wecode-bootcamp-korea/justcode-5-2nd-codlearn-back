@@ -14,7 +14,7 @@ async function readUserByEmail(email) {
     SELECT * FROM users
     WHERE email=${email}
   `;
-  return user;
+  return user[0];
 }
 
 async function createUser(userInfo, social) {

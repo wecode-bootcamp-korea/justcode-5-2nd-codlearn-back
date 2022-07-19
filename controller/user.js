@@ -10,13 +10,13 @@ const FRONT_URL = 'http://localhost/3000';
 const signupController = async (req, res) => {
   const userInfo = req.body;
   await signup(userInfo);
-  return res.status(201).json({ message: SIGNUP_SUCCEEDED });
+  return res.status(201).json({ message: 'SIGNUP_SUCCEEDED' });
 };
 
 const loginController = async (req, res) => {
   const userInfo = req.body;
   await login(userInfo);
-  return res.status(201).json({ message: LOGIN_SUCCEEDED });
+  return res.status(201).json({ message: 'LOGIN_SUCCEEDED' });
 };
 
 const requestKaKaoAuthController = async (req, res) => {

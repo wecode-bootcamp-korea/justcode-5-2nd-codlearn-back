@@ -12,7 +12,7 @@ const {
 } = require('../controller/user');
 
 router.post('/signup', asyncWrap(signupController));
-router.get('/login', asyncWrap(loginController));
+router.post('/login', asyncWrap(loginController));
 
 // Kakao Login
 router.get('/kakao/request', asyncWrap(requestKaKaoAuthController));

@@ -1,5 +1,6 @@
 const jwt = require(`jsonwebtoken`);
 const bcrypt = require('bcrypt');
+const salt = bcrypt.genSaltSync();
 const axios = require('axios');
 
 const {
@@ -20,7 +21,7 @@ const KAKAO_CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 const doesUserExist = async email => {
   const user = await readUserByEmail(email);
-  return user.length > 0 ? user[0] : null;
+  return user.length > 0 ? user : null;
 };
 
 const validateEmail = email => {
@@ -33,13 +34,13 @@ const validateEmail = email => {
 
 const isInputValid = userInfo => {
   if (!validateEmail(userInfo.email)) {
-    const msg = `SIGNUP_FAILED: EMAIL_NOT_VALID`;
+    const msg = `EMAIL_NOT_VALID`;
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
   }
   if (userInfo.password.length < 7) {
-    const msg = 'SIGNUP_FAILED: PASSWORD_NOT_VALID';
+    const msg = 'PASSWORD_NOT_VALID';
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
@@ -75,7 +76,7 @@ const login = async userInfo => {
   isInputValid(userInfo);
   const user = await readUserByEmail(userInfo.email);
   let errMsg;
-  if (user.id) {
+  if (user) {
     const isValid = await bcrypt.compare(userInfo.password, user.password);
     if (isValid) {
       const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, {
