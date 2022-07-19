@@ -8,11 +8,11 @@ const {
 
 const limit = 16;
 
-const isWishListNotEmpty = async (userId) => {
+const isWishListNotEmpty = async userId => {
   return await checkTableNotEmpty(userId, 'wishlist');
 };
 
-const getWishList = async (userId) => {
+const getWishList = async userId => {
   return isWishListNotEmpty(userId) ? await getItems(userId, limit) : {};
 };
 
