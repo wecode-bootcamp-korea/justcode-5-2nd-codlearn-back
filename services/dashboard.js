@@ -1,5 +1,5 @@
+const { checkTableNotEmpty } = require('../models/common');
 const {
-  checkTableNotEmpty,
   getUser,
   getCoursesBySort,
   getWishListItems,
@@ -7,15 +7,15 @@ const {
 
 const limit = 3;
 
-const isMyCourseNotEmpty = async (userId) => {
+const isMyCourseNotEmpty = async userId => {
   return await checkTableNotEmpty(userId, 'my_classes');
 };
 
-const isWishListNotEmpty = async (userId) => {
+const isWishListNotEmpty = async userId => {
   return await checkTableNotEmpty(userId, 'wishlist');
 };
 
-const getDashBoardItems = async (userId) => {
+const getDashBoardItems = async userId => {
   let user = await getUser(userId);
   let recentlyRegistered;
   let recentlyTaken;
