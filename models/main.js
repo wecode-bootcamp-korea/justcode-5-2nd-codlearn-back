@@ -75,7 +75,6 @@ async function getSearchList(searchQuery){
     WHERE class_name LIKE '%${searchQuery}%'
     limit 8
     `
-    console.log(result);
     const searchResult = await prisma.$queryRawUnsafe(result);
     return searchResult;
 
