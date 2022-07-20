@@ -1,4 +1,5 @@
 const express = require('express');
+const userRouter = require('./user');
 const cartRouter = require('./cart');
 const myClassRouter = require('./myClasses');
 const coursesRouter = require('./courses');
@@ -9,6 +10,7 @@ const mainRouter = require('./main')
 
 const router = express.Router();
 
+router.use('/user', userRouter);
 router.use('/cart', cartRouter);
 router.use('/my-classes', myClassRouter);
 router.use('/courses', coursesRouter);
