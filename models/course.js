@@ -62,6 +62,30 @@ async function getCommentsById(titleID){
   
 }
 
+async function deleteCommentById(commentID){
+  await prisma.$queryRaw`
+        DELETE FROM review
+        WHERE review.id = ${commentID}
+    `;
+
+}
+
+
+async function updateCommentById(updateCommentDto){
+  const {commentId, user_id, content, rating} = updateCommentDto;
+  await prisma.$queryRaw`
+        UPDATE 
+            review
+        SET
+            review_content = ${content},
+            rate = ${rating}
+        WHERE review.id =${commentId}; 
+    `;
+
+
+
+
+}
 module.exports = {
-  getCourseDetail, addReview,getCommentsById
+  getCourseDetail, addReview,getCommentsById,deleteCommentById,updateCommentById
 };

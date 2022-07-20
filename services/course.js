@@ -1,4 +1,4 @@
-const { addReview
+const { addReview,updateCommentById
   } = require('../models/course');
 
 async function addComment(class_id, user_id, content, rating){
@@ -12,4 +12,9 @@ async function addComment(class_id, user_id, content, rating){
 
 }
 
-  module.exports = { addComment};
+async function editComment(commentId, user_id, content, rating){
+  const updateCommentDto = {commentId, user_id, content, rating};
+  await updateCommentById(updateCommentDto);
+}
+
+  module.exports = { addComment, editComment};
