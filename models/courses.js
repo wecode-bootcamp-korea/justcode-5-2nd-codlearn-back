@@ -96,15 +96,19 @@ async function readClassesListByCategory1(
   const classesList = await prisma.$queryRawUnsafe(query);
   return classesList;
 }
+
+
 async function readClassesListByCategory2(
   category2,
   pageNum,
   level,
   price,
   sort,
-  search
+  search,
+  skill
 ) {
   var categoryID2 = categoryTransform2(category2);
+  var skillID = skillTransform(skill);
   const start = (pageNum - 1) * 16;
   const condition = {
     'classes.level_id': level,
@@ -132,6 +136,7 @@ FROM classes
     Join category c2 on c2.id = classes.category2_id
     Join category c3 on c3.id = classes.category3_id
 WHERE classes.category2_id = ${categoryID2}
+${skill? ` AND classes.category3_id = ${skillID}`:``}
 ${whereAnd2(condition)}
 ${sort === 'famous' ? `order by students DESC ` : ``}
 ${sort === 'rating' ? `order by rate DESC` : ``}
@@ -221,8 +226,9 @@ ${search && (level || price) ? `AND classes.class_name LIKE '%${search}%'` : ``}
   return totalPage;
 }
 
-async function getTotalPages2(category2, level, price,search) {
+async function getTotalPages2(category2, level, price,search,skill) {
   var categoryID = categoryTransform2(category2);
+  var skillID = skillTransform(skill);
   const condition = {
     'classes.level_id': level,
     'classes.price': price,
@@ -236,12 +242,104 @@ async function getTotalPages2(category2, level, price,search) {
     Join category c2 on c2.id = classes.category2_id
     Join category c3 on c3.id = classes.category3_id
     WHERE category2_id = ${categoryID}
+    ${skill? ` AND classes.category3_id = ${skillID}`:``}
+  
 ${whereAnd(condition)}
 ${search && (level || price) ? `AND classes.class_name LIKE '%${search}%'` : ``} `;
 
   const totalPage = await prisma.$queryRawUnsafe(query);
   return totalPage;
 }
+
+function skillTransform(skill) {
+  let result; 
+  if(skill === "javascript"){
+    result = 13; 
+  }else if (skill === "react" ){
+    result = 14 ;
+  }
+  else if (skill === "vuejs"){
+    result = 15;
+  }
+  else if (skill === "java"){
+    result =16 ;
+  }
+  else if (skill === "spring"){
+    result =17 ;
+  }
+  else if (skill === "aws" ){
+    result = 18;
+  }
+  else if (skill === "ios"){
+    result =19 ;
+  }
+  else if (skill ==="game-design" ){
+    result = 20;
+  }
+  else if (skill === "block-coding" ){
+    result =21 ;
+  }
+  else if (skill ==="information-security" ){
+    result = 22;
+  }
+  else if (skill ==="penetration-testing" ){
+    result =23 ;
+  }
+  else if (skill === "reversing" ){
+    result =24 ;
+  }
+  else if (skill ==="cloud" ){
+    result = 25;
+  }
+  else if (skill ==="network" ){
+    result = 26;
+  }
+  else if (skill === "severless" ){
+    result = 27;
+  }
+  else if (skill === "blockchain"){
+    result = 28;
+  }
+  else if (skill === "nft"){
+    result = 29;
+  }
+  else if (skill === "game-dev"){
+    result = 30;
+  }
+  else if (skill === "data-analysis" ){
+    result = 31;
+  }
+  else if (skill === "python"){
+    result = 32;
+  }
+  else if (skill === "sql"){
+    result = 33;
+  }
+  else if (skill === "machine-learning"){
+    result = 34;
+  }
+  else if (skill === "deep-learning" ){
+    result = 35;
+  }
+  else if (skill ==="keras" ){
+    result = 36;
+  }
+  else if (skill === "data-vis"){
+    result = 37;
+  }
+  else if (skill === "excel" ){
+    result = 38;
+  }
+  else if (skill === "bigdata"){
+    result = 39;
+  }
+
+  return result; 
+}
+
+
+
+
 
 module.exports = {
   readClassesList,
@@ -251,3 +349,5 @@ module.exports = {
   getTotalPages1,
   getTotalPages2,
 };
+
+
