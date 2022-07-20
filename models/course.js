@@ -46,16 +46,16 @@ async function addReview(addCommentDto){
 async function getCommentsById(titleID){
   const review = await prisma.$queryRawUnsafe(`
   SELECT 
+    review.id,
     review.rate,
     review.review_content, 
     review.created_at, 
-    users.user_name 
+    users.user_name,
+    users.user_img
   FROM review 
     JOIN users on review.user_id = users.id
   WHERE review.class_id = ${titleID}
-
-  
-  
+  ORDER BY created_at ASC
   `);
 
   return review; 

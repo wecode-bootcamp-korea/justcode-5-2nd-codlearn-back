@@ -23,7 +23,6 @@ const writeComment = async (req,res) => {
 }
 
 const getComment = async (req,res) => {
-
   try{
     const titleId = req.params.title; 
     const review = await getCommentsById(titleId);
@@ -33,6 +32,20 @@ const getComment = async (req,res) => {
   } 
 }
 
+// const deleteComment = async(req,res)=> {
+//   try{
+//     const commentId = req.params.title; 
+//     const review = await getCommentsById(titleId);
+//     return res.json(review);
+//   }catch(err){
+//     res.status(err.statusCode || 500).json({ message: err.message });
+//   } 
+// }
+// const updateComment = async(req,res)=> {
+
+
+// }
+
 module.exports = {
-    readCourseDetail, writeComment, getComment,
+    readCourseDetail, writeComment, getComment
   };
