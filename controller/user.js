@@ -1,7 +1,6 @@
 const { signup, login, kakaoLogin } = require('../services/user');
 
 require('dotenv').config();
-const PORT = process.env.PORT || 10010;
 const KAKAO_AUTH_URL = 'https://kauth.kakao.com/oauth/authorize';
 const REST_API_KEY = process.env.REST_API_KEY;
 const REDIRECT_URI = process.env.REDIRECT_URI;
@@ -22,7 +21,7 @@ const loginController = async (req, res) => {
 const requestKaKaoAuthController = async (req, res) => {
   const paramsObj = {
     client_id: REST_API_KEY,
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: REDIRECT_URI, // backend
     response_type: 'code',
   };
   const searchParams = new URLSearchParams(paramsObj).toString();
@@ -34,7 +33,8 @@ const kakaoTokenController = async (req, res) => {
   const code = req.query.code;
   const kakaoToken = await kakaoLogin(code);
   const accessToken = kakaoToken.data.access_token;
-  res.redirect(`${userInfo}/?token=${accessToken}`);
+  let encodedToken = encodeURIComponent(accessToken);
+  res.redirect(`${userInfo}/?token=${accessToken}` + encodedToken);
 };
 
 const kakaoUserInfoController = async (req, res) => {

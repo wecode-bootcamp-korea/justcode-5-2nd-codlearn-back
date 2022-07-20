@@ -63,6 +63,7 @@ const signup = async (userInfo, social) => {
       social: social,
     };
     const userId = await createUser(input, social);
+    console.log(`${social ? 'SOCIAL_' : ''}` + 'SIGNUP_SUCCEEDED');
     return userId;
   } else {
     const msg = 'SIGNUP_FAILED: EMAIL_EXIST';
@@ -94,7 +95,7 @@ const login = async userInfo => {
   throw error;
 };
 
-const getKakaoAccessToken = async code => {
+const getKakaoToken = async code => {
   const oauthTokenUrl = KAKAO_OAUTH_TOKEN_API_URL;
   try {
     const kakaoToken = await axios({
@@ -108,6 +109,7 @@ const getKakaoAccessToken = async code => {
         client_id: KAKAO_CLIENT_ID,
         redirect_uri: KAKAO_REDIRECT_URI,
         code: code,
+        client_secret: KAKAO_CLIENT_SECRET,
       },
     });
     console.log('GET_ACCESS_TOKEN_SUCCEEDED');
@@ -131,22 +133,24 @@ const getKakaoUserInfo = async accessToken => {
     return userInfo;
   } catch (error) {
     console.log('GET_USER_INFO_FAILED');
+    error.statusCode = 400;
     throw error;
   }
 };
 
 const kakaoSignup = async userInfo => {
-  await createUser(userInfo, true);
-};
-
-const getKakaoToken = async code => {
-  const kakaoToken = await getKakaoAccessToken(code);
-  const accessToken = kakaoToken.data.access_token;
-  return kakaoToken;
+  try {
+    await createUser(userInfo, true);
+    console.log(`KAKAO_SIGNUP_SUCCEEDED`);
+  } catch (error) {
+    error.statusCode = 400;
+    error.message = 'KAKAO_SIGNUP_FAILED';
+    throw error;
+  }
 };
 
 const getUserInfoByKakaoToken = async code => {
-  const kakaoToken = await getKakaoAccessToken(code);
+  const kakaoToken = await getKakaoToken(code);
   const accessToken = kakaoToken.data.access_token;
   const refreshToken = kakaoToken.data.refresh_token;
 
@@ -169,7 +173,6 @@ const getUserInfoByKakaoToken = async code => {
 
 const kakaoLogin = async code => {
   const userInfo = await getUserInfoByKakaoToken(code);
-
   const user = await doesUserExist(userInfo.email);
   let userId;
   if (!user) userId = await signup(userInfo, true);
@@ -180,6 +183,19 @@ const kakaoLogin = async code => {
     expiresIn: '1h',
   });
   return token;
+};
+
+const createToken = async userId => {
+  try {
+    const token = jwt.sign({ id: userId }, process.env.SECRET_KEY, {
+      expiresIn: '1h',
+    });
+    return token;
+  } catch (error) {
+    error.statusCode = 400;
+    error.message = 'CREATE_TOKEN_FAILED';
+    throw error;
+  }
 };
 
 module.exports = { signup, login, kakaoLogin };
