@@ -58,8 +58,8 @@ const deleteComment = async(req,res)=> {
 }
 const updateComment = async(req,res)=> {
   try{
-    const {review_contents, rating, review_id} = req.body;
-    await editComment(review_contents, rating, review_id);
+    const {review_contents, rate, review_id} = req.body;
+    await editComment(review_contents, rate, review_id);
     res.status(201).json({ message: 'comment updated successfully' });
   }catch(err){
     res.status(err.statusCode || 500).json({ message: err.message });
