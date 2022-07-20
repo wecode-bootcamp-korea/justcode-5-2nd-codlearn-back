@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+
 async function getCourseDetail(titleID) {
   const classDetail = await prisma.$queryRawUnsafe(`
     SELECT
@@ -34,7 +35,33 @@ async function getCourseDetail(titleID) {
 
   return classDetail;
 }
+async function addReview(addCommentDto){
+  const {class_id, user_id, content, rating} = addCommentDto;
+  await prisma.$queryRaw`
+  INSERT INTO review (user_id, rate, class_id, review_content)
+  VALUES (${user_id}, ${rating}, ${class_id}, ${content});
+`;
+
+}
+async function getCommentsById(titleID){
+  const review = await prisma.$queryRawUnsafe(`
+  SELECT 
+    review.rate,
+    review.review_content, 
+    review.created_at, 
+    users.user_name 
+  FROM review 
+    JOIN users on review.user_id = users.id
+  WHERE review.class_id = ${titleID}
+
+  
+  
+  `);
+
+  return review; 
+  
+}
 
 module.exports = {
-  getCourseDetail,
+  getCourseDetail, addReview,getCommentsById
 };
