@@ -34,7 +34,7 @@ const kakaoTokenController = async (req, res) => {
   const kakaoToken = await kakaoLogin(code);
   const accessToken = kakaoToken.data.access_token;
   let encodedToken = encodeURIComponent(accessToken);
-  res.redirect(`${userInfo}/?token=${accessToken}` + encodedToken);
+  res.redirect(`${userInfo}/?token=${accessToken}`);
 };
 
 const kakaoUserInfoController = async (req, res) => {
