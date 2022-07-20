@@ -21,7 +21,7 @@ const KAKAO_CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 const doesUserExist = async email => {
   const user = await readUserByEmail(email);
-  return user.length > 0 ? user : null;
+  return user;
 };
 
 const validateEmail = email => {
