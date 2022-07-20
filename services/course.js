@@ -12,8 +12,8 @@ async function addComment(class_id, user_id, content, rating){
 
 }
 
-async function editComment(commentId, user_id, content, rating){
-  const updateCommentDto = {commentId, user_id, content, rating};
+async function editComment(review_contents, rating, review_id){
+  const updateCommentDto = {review_contents, rating, review_id};
   await updateCommentById(updateCommentDto);
 }
 

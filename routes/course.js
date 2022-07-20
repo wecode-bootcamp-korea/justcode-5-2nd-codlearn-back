@@ -14,8 +14,8 @@ const {
 router.get('/:title',  asyncWrap(readCourseDetail));
 router.get('/:title/review',  asyncWrap(getComment));
 router.post('/:title/review',  asyncWrap(writeComment));
-router.delete('/:title/review/:id',  asyncWrap(deleteComment));
-router.put('/:title/review/:id',  asyncWrap(updateComment));
+router.delete('/:title/review',  asyncWrap(deleteComment));
+router.put('/:title/review',  asyncWrap(updateComment));
 
 
 
