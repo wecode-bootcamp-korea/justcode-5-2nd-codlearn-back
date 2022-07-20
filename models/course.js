@@ -1,7 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-
 async function getCourseDetail(titleID) {
   const classDetail = await prisma.$queryRawUnsafe(`
     SELECT
@@ -35,17 +34,18 @@ async function getCourseDetail(titleID) {
 
   return classDetail;
 }
-async function addReview(addCommentDto){
-  const {class_id, user_id, content, rating} = addCommentDto;
+async function addReview(addCommentDto) {
+  const { class_id, user_id, content, rating } = addCommentDto;
   await prisma.$queryRaw`
   INSERT INTO review (user_id, rate, class_id, review_content)
   VALUES (${user_id}, ${rating}, ${class_id}, ${content});
 `;
-
 }
-async function getCommentsById(titleID){
+async function getCommentsById(titleID) {
+
   const review = await prisma.$queryRawUnsafe(`
   SELECT 
+    review.user_id,
     review.id,
     review.rate,
     review.review_content, 
@@ -58,34 +58,31 @@ async function getCommentsById(titleID){
   ORDER BY created_at ASC
   `);
 
-  return review; 
-  
+  return review;
 }
 
-async function deleteCommentById(commentID){
+async function deleteCommentById(review_id) {
   await prisma.$queryRaw`
         DELETE FROM review
-        WHERE review.id = ${commentID}
+        WHERE review.id = ${review_id}
     `;
-
 }
 
-
-async function updateCommentById(updateCommentDto){
-  const {commentId, user_id, content, rating} = updateCommentDto;
+async function updateCommentById(updateCommentDto) {
+  const { review_contents, rating, review_id } = updateCommentDto;
   await prisma.$queryRaw`
         UPDATE 
             review
         SET
-            review_content = ${content},
+            review_content = ${review_contents},
             rate = ${rating}
-        WHERE review.id =${commentId}; 
+        WHERE review.id =${review_id}; 
     `;
-
-
-
-
 }
 module.exports = {
-  getCourseDetail, addReview,getCommentsById,deleteCommentById,updateCommentById
+  getCourseDetail,
+  addReview,
+  getCommentsById,
+  deleteCommentById,
+  updateCommentById,
 };
