@@ -69,13 +69,13 @@ async function deleteCommentById(review_id) {
 }
 
 async function updateCommentById(updateCommentDto) {
-  const { review_contents, rating, review_id } = updateCommentDto;
+  const { review_contents, rate, review_id } = updateCommentDto;
   await prisma.$queryRaw`
         UPDATE 
             review
         SET
             review_content = ${review_contents},
-            rate = ${rating}
+            rate = ${rate}
         WHERE review.id =${review_id}; 
     `;
 }
