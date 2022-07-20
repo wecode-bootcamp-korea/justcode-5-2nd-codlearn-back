@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 10010;
 const KAKAO_AUTH_URL = 'https://kauth.kakao.com/oauth/authorize';
 const REST_API_KEY = process.env.REST_API_KEY;
 const REDIRECT_URI = process.env.REDIRECT_URI;
-const FRONT_URL = 'http://localhost/3000';
+const FRONT_REDIRECT_URL = process.env.FRONT_REDIRECT_URL;
 
 const signupController = async (req, res) => {
   const userInfo = req.body;
@@ -45,7 +45,7 @@ const kakaoLoginController = async (req, res) => {
   const code = req.query.code;
   const token = await kakaoLogin(code);
   console.log('token to front: ', token);
-  res.redirect(`${FRONT_URL}/?token=${token}`);
+  res.redirect(`${FRONT_REDIRECT_URL}/?token=${token}`);
 };
 
 module.exports = {
