@@ -12,7 +12,30 @@ const readCourseDetail = async (req, res) => {
   }
 };
 
+const writeComment = async (req,res) => {
+  try{
 
+
+  }catch(err){
+    res.status(err.statusCode || 500).json({ message: err.message });
+  }
+}
+
+const getComment = async (req,res) => {
+  try{
+
+  }catch(err){
+    res.status(err.statusCode || 500).json({ message: err.message });
+  }
+}
+
+const deleteComment = async (req,res) => {
+  try{
+
+  }catch(err){
+    res.status(err.statusCode || 500).json({ message: err.message });
+  }
+}
 module.exports = {
-    readCourseDetail
+    readCourseDetail, writeComment, getComment, deleteComment
   };
