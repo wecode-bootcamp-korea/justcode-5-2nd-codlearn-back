@@ -63,6 +63,21 @@ async function getMainDetailFree() {
     return classDetail;
 }
 
+async function getSearchList(){
+    const result = `
+    SELECT 
+        classes.id,
+        classes.class_name,
+        instructor.instructor_name,
+        classes.img
+    FROM classes
+        join instructor on classes.instructor_id = instructor.id
+    `
+    const searchResult = await prisma.$queryRawUnsafe(result);
+    return searchResult;
+
+}
+
 module.exports = {
-    getMainDetailFree,getMainDetailIntro
+    getMainDetailFree,getMainDetailIntro,getSearchList
 };
