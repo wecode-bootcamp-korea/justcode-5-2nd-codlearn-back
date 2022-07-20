@@ -63,7 +63,7 @@ async function getMainDetailFree() {
     return classDetail;
 }
 
-async function getSearchList(){
+async function getSearchList(searchQuery){
     const result = `
     SELECT 
         classes.id,
@@ -72,7 +72,10 @@ async function getSearchList(){
         classes.img
     FROM classes
         join instructor on classes.instructor_id = instructor.id
+    WHERE class_name LIKE '%${searchQuery}%'
+    limit 8
     `
+    console.log(result);
     const searchResult = await prisma.$queryRawUnsafe(result);
     return searchResult;
 
