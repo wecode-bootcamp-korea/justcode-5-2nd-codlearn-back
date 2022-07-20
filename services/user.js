@@ -51,6 +51,19 @@ const makeHash = async password => {
   return await bcrypt.hash(password, 10);
 };
 
+const createToken = async userId => {
+  try {
+    const token = jwt.sign({ id: userId }, process.env.SECRET_KEY, {
+      expiresIn: '1h',
+    });
+    return token;
+  } catch (error) {
+    error.statusCode = 400;
+    error.message = 'CREATE_TOKEN_FAILED';
+    throw error;
+  }
+};
+
 const signup = async (userInfo, social) => {
   const checkEmailExist = await doesUserExist(userInfo.email);
   if (!checkEmailExist) {
@@ -83,7 +96,7 @@ const login = async userInfo => {
       const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, {
         expiresIn: '1h',
       });
-      return token;
+      return createToken(user.id);
     } else {
       errMsg = 'EMAIL_PASSWORD_NOT_MATCH';
     }
@@ -129,10 +142,10 @@ const getKakaoUserInfo = async accessToken => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log('GET_USER_INFO_SUCCEEDED');
+    console.log('GET_KAKAO_USER_INFO_SUCCEEDED');
     return userInfo;
   } catch (error) {
-    console.log('GET_USER_INFO_FAILED');
+    console.log('GET_KAKAO_USER_INFO_FAILED');
     error.statusCode = 400;
     throw error;
   }
@@ -179,23 +192,7 @@ const kakaoLogin = async code => {
   if (user && user.social) userId = await readUserIdByEmail(userInfo.email);
   if (user && !user.social) userId = await transferUserToSocialUser(userInfo);
 
-  const token = jwt.sign({ id: userId }, process.env.SECRET_KEY, {
-    expiresIn: '1h',
-  });
-  return token;
-};
-
-const createToken = async userId => {
-  try {
-    const token = jwt.sign({ id: userId }, process.env.SECRET_KEY, {
-      expiresIn: '1h',
-    });
-    return token;
-  } catch (error) {
-    error.statusCode = 400;
-    error.message = 'CREATE_TOKEN_FAILED';
-    throw error;
-  }
+  return createToken(userId);
 };
 
 module.exports = { signup, login, kakaoLogin };

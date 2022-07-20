@@ -14,8 +14,8 @@ const signupController = async (req, res) => {
 
 const loginController = async (req, res) => {
   const userInfo = req.body;
-  await login(userInfo);
-  return res.status(201).json({ message: 'LOGIN_SUCCEEDED' });
+  const token = await login(userInfo);
+  return res.status(201).json({ token: token });
 };
 
 const requestKaKaoAuthController = async (req, res) => {
@@ -44,8 +44,14 @@ const kakaoUserInfoController = async (req, res) => {
 const kakaoLoginController = async (req, res) => {
   const code = req.query.code;
   const token = await kakaoLogin(code);
-  console.log('token to front: ', token);
-  res.redirect(`${FRONT_REDIRECT_URL}/?token=${token}`);
+  if (token) {
+    console.log('token to front: ', token);
+    res.redirect(`${FRONT_REDIRECT_URL}/?token=${token}`);
+  } else {
+    const error = new Error('KAKAO_TOKEN_INVALID');
+    error.statusCode = 400;
+    throw error;
+  }
 };
 
 module.exports = {
