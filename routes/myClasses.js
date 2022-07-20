@@ -10,7 +10,7 @@ const {
 } = require('../controller/myClasses');
 
 router.get('/:id', asyncWrap(getMyClassItemsController));
-router.put('/:id', asyncWrap(addMyClassItemsController));
+router.post('/:id', asyncWrap(addMyClassItemsController));
 router.patch('/update/:id', asyncWrap(updateMyClassItemsController));
 router.delete('/:id', asyncWrap(deleteMyClassItemController));
 
