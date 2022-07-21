@@ -56,7 +56,7 @@ async function transferUserToSocialUser(email) {
   await prisma.$queryRawUnsafe(`
     UPDATE users SET 
       social=1,
-      password=null
+      password=NULL
     WHERE email=${email}
   `);
   const userId = await prisma.$queryRaw`
