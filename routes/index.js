@@ -6,7 +6,7 @@ const coursesRouter = require('./courses');
 const courseRouter = require('./course');
 const dashBoardRouter = require('./dashboard');
 const wishlistRouter = require('./wishlist');
-const mainRouter = require('./main')
+const mainRouter = require('./main');
 
 const router = express.Router();
 
@@ -17,5 +17,5 @@ router.use('/courses', coursesRouter);
 router.use('/course', courseRouter);
 router.use('/dashboard', dashBoardRouter);
 router.use('/wishlist', wishlistRouter);
-router.use('/', mainRouter)
+router.use('/', mainRouter);
 module.exports = router;

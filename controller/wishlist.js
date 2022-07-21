@@ -5,22 +5,22 @@ const {
 } = require('../services/wishlist');
 
 const getwishListItemsController = async (req, res) => {
-  const userId = req.params.id;
-  const items = await getWishList(userId);
+  const user = req.user;
+  const items = await getWishList(user.id);
   return res.status(200).json({ data: items });
 };
 
 const addWishListItemController = async (req, res) => {
-  const userId = req.params.id;
+  const user = req.user;
   const classId = req.query.classId;
-  await addToWishList(userId, classId);
+  await addToWishList(user.id, classId);
   return res.status(201).json({ message: 'item added into wishlist' });
 };
 
 const deleteWishListItemController = async (req, res) => {
-  const userId = req.params.id;
+  const user = req.user;
   const classId = req.query.classId;
-  await deleteFromWishlist(userId, classId);
+  await deleteFromWishlist(user.id, classId);
   return res.status(201).json({ message: 'item deleted from wishlist' });
 };
 
