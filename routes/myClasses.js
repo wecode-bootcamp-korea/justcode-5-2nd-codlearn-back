@@ -12,7 +12,7 @@ const {
 
 router.use(verifyToken);
 router.get('/', verifyToken, asyncWrap(getMyClassItemsController));
-router.put('/', verifyToken, asyncWrap(addMyClassItemsController));
+router.post('/', verifyToken, asyncWrap(addMyClassItemsController));
 router.patch('/update/', verifyToken, asyncWrap(updateMyClassItemsController));
 router.delete('/', verifyToken, asyncWrap(deleteMyClassItemController));
 

@@ -65,7 +65,7 @@ const deleteFromMyClass = async (userId, classList) => {
     });
   } else {
     console.log('ADD_FAILED: class is not in my classes.');
-    const msg = 'CLASS_NOT_FOUND: ' + JSON.stringify(classNotExist);
+    const msg = 'CLASS_NOT_FOUND: classId: ' + JSON.stringify(classNotExist);
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
