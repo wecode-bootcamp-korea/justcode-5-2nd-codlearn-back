@@ -105,6 +105,8 @@ const login = async userInfo => {
 
   if (!user) {
     errMsg = `USER_NOT_EXIST`;
+  } else if (user.social) {
+    errMsg = `SOCIAL_USER`;
   } else {
     const isValid = await bcrypt.compare(userInfo.password, user.password);
     if (!isValid) {
