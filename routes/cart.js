@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const asyncWrap = require('../async-wrap');
 const router = Router();
+const { verifyToken } = require('../middleware/auth');
 
 const {
   getCartItemsController,
@@ -8,8 +9,9 @@ const {
   deleteCartItemController,
 } = require('../controller/cart');
 
-router.get('/:id', asyncWrap(getCartItemsController));
-router.put('/:id', asyncWrap(addCartItemController));
-router.delete('/:id', asyncWrap(deleteCartItemController));
+router.use(verifyToken);
+router.get('/', verifyToken, asyncWrap(getCartItemsController));
+router.put('/', verifyToken, asyncWrap(addCartItemController));
+router.delete('/', verifyToken, asyncWrap(deleteCartItemController));
 
 module.exports = router;
