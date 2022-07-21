@@ -28,6 +28,7 @@ const getComment = async (req,res) => {
   try{
     const token = req.headers.authorization.split(' ')[1]; // front => header
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+    const {titleId} = req.body; 
     const userId = decodedToken.id;
     const review = await getCommentsById(titleId);
 
