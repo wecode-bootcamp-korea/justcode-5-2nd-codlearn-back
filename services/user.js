@@ -52,6 +52,9 @@ const isInputValid = (userInfo, social) => {
     if (userInfo.password.length < 7) {
       msg = 'PASSWORD_NOT_VALID';
     }
+    if (userInfo.user_name == null || userInfo.user_name?.length < 2) {
+      msg = 'USER_NAME_REQUIRED. user_name.length > 1';
+    }
   }
   if (msg) {
     const error = new Error(msg);
@@ -113,11 +116,14 @@ const login = async userInfo => {
     if (!isValid) {
       errMsg = 'EMAIL_PASSWORD_NOT_MATCH';
     } else {
-      return await createToken(user.id);
+      console.log('CODLEARN_LOGIN_SUCCEEDED');
+      const token = await createToken(user.id);
+      console.log('CODLEARN_LOGIN_TOKEN_GENERATATED');
+      return token;
     }
   }
   const error = new Error(errMsg);
-  error.statusCode = 500;
+  error.statusCode = 400;
   throw error;
 };
 
@@ -171,18 +177,18 @@ const getUserInfoByKakaoToken = async code => {
   const accessToken = kakaoToken.data.access_token;
   const kakaoUserInfo = await getKakaoUserInfo(accessToken);
   const kakaoAccount = kakaoUserInfo.data.kakao_account;
-  const kakaoProperties = kakaoUserInfo.data.kakao_account.properties;
+  const kakaoProperties = kakaoUserInfo.data.properties;
   if (!kakaoAccount.has_email || !kakaoAccount.email) {
     const error = new Error('SIGNUP_FAILED: EMAIL_NEEDS_AGREEMENT');
     error.statusCode = 400;
     throw error;
   } else {
     const email = kakaoAccount.email;
-    const user_name = kakaoAccount.profile_nickname_needs_agreement
+    const user_name = !kakaoAccount.profile_nickname_needs_agreement
       ? kakaoProperties.nickname
       : kakaoAccount.email;
-    const user_img = kakaoAccount.profile_image_needs_agreement
-      ? kakaoAccount.profile.profile_img_url
+    const user_img = !kakaoAccount.profile_image_needs_agreement
+      ? kakaoProperties.profile_image
       : null;
 
     const userInfo = {
@@ -199,11 +205,19 @@ const kakaoLogin = async code => {
   const userInfo = await getUserInfoByKakaoToken(code);
   const user = await doesUserExist(userInfo.email);
   let userId;
-  if (!user) userId = await signup(userInfo, true);
+  if (!user) {
+    userId = await signup(userInfo, true);
+    console.log('SOCIAL_LOGIN_SUCCEEDED');
+  }
+  if (user && !user.social) {
+    userId = await transferUserToSocialUser(userInfo);
+    console.log('TRANSFER_USER_AS_SOCIAL_USER_SUCCEEDED');
+  }
   if (user && user.social) userId = await readUserIdByEmail(userInfo.email);
-  if (user && !user.social) userId = await transferUserToSocialUser(userInfo);
-
-  return createToken(userId);
+  console.log('SOCIAL_LOGIN_SUCCEEDED');
+  const token = await createToken(userId);
+  console.log('CODLEARN_LOGIN_TOKEN_GENERATATED');
+  return token;
 };
 
 module.exports = { signup, login, kakaoLogin };

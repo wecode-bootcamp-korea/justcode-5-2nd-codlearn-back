@@ -44,7 +44,7 @@ async function createUser(userInfo) {
       ) VALUES (
          '${userInfo.email}',
          '${userInfo.user_name}',
-         ${userInfo.user_img ? `${userInfo.user_img}, ` : ``}
+         '${userInfo.user_img}',
          NULL)
       `;
     await prisma.$queryRawUnsafe(query);
