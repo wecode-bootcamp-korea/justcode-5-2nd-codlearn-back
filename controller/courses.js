@@ -10,15 +10,20 @@ const {
 const readCoursesList = async (req, res) => {
   try {
     const pageNum = req.query.page;
+    const search  = req.query.s; 
     const levelQuery = req.query.level || '';
     const level = levelQuery.split(',').filter(value => value != '');
     const priceQuery = req.query.charge || '';
     const price = priceQuery.split(',').filter(value => value != '');
     const sort = req.query.order; 
-    const coursesList = await readClassesList(pageNum, level, price,sort);
-    const page = await getTotalPages(pageNum,level,price);
+    const coursesList = await readClassesList(pageNum, level, price,sort,search);
+    const pageList= await getTotalPages(pageNum,level,price,search);
+    const page = pageList[0];
+    const object2 ={data:coursesList};
+    const result = Object.assign(page, object2);
+    return res.status(200).json(result);
+   
 
-    return res.status(200).json(page.concat(coursesList));
   } catch (err) {
     res.status(err.statusCode || 500).json({ message: err.message });
   }
@@ -27,15 +32,19 @@ const readCoursesList = async (req, res) => {
 const readCoursesListByCategory1 = async (req, res) => {
   try {
     const { category } = req.params;
+    const search  = req.query.s; 
     const pageNum = req.query.page;
     const levelQuery = req.query.level || '';
     const level = levelQuery.split(',').filter(value => value != '');
     const priceQuery = req.query.charge || '';
     const price = priceQuery.split(',').filter(value => value != '');
     const sort = req.query.order; 
-    const page = await getTotalPages1(category, level,price);
-    const coursesList = await readClassesListByCategory1(category, pageNum,level, price,sort);
-    return res.status(200).json(page.concat(coursesList));
+    const pageList = await getTotalPages1(category, level,price,search);
+    const page = pageList[0];
+    const coursesList = await readClassesListByCategory1(category, pageNum,level, price,sort,search);
+    const object2 ={data:coursesList};
+    const result = Object.assign(page, object2);
+    return res.status(200).json(result);
   } catch (err) {
     res.status(err.statusCode || 500).json({ message: err.message });
   }
@@ -44,15 +53,20 @@ const readCoursesListByCategory1 = async (req, res) => {
 const readCoursesListByCategory2 = async (req, res) => {
   try {
     const { category2 } = req.params;
+    const search = req.query.s; 
     const pageNum = req.query.page;
+    const skill =req.query.skill;
     const levelQuery = req.query.level || '';
     const level = levelQuery.split(',').filter(value => value != '');
     const priceQuery = req.query.charge || '';
     const price = priceQuery.split(',').filter(value => value != '');
-    const page = await getTotalPages2(category2,level,price);
+    const pageList = await getTotalPages2(category2,level,price,search,skill);
+    const page = pageList[0];
     const sort = req.query.order; 
-    const coursesList = await readClassesListByCategory2(category2, pageNum,level,price,sort);
-    return res.status(200).json(page.concat(coursesList));
+    const coursesList = await readClassesListByCategory2(category2, pageNum,level,price,sort,search,skill);
+    const object2 ={data:coursesList};
+    const result = Object.assign(page, object2);
+    return res.status(200).json(result);
   } catch (err) {
     res.status(err.statusCode || 500).json({ message: err.message });
   }

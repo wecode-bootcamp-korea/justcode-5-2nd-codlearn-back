@@ -33,20 +33,21 @@ const validateEmail = email => {
 };
 
 const isInputValid = (userInfo, social) => {
+  console.log(userInfo);
   console.log('userInfo', userInfo);
   let msg = null;
   if (!userInfo) {
     msg = 'INVALID_USER_INFO';
   }
-  if (!userInfo.email || !userInfo.user_name) {
-    msg = 'INSUFFICENT_USER_INFO';
-  }
+  // if (!userInfo.email || !userInfo.user_name) {
+  //   msg = 'INSUFFICENT_USER_INFO';
+  // }
   if (!validateEmail(userInfo.email)) {
     msg = `EMAIL_NOT_VALID`;
   }
-  if (userInfo.user_name.length < 3) {
-    msg = 'USER_NAME_REQUIREMENT: length > 3';
-  }
+  // if (userInfo?.user_name?.length < 3) {
+  //   msg = 'USER_NAME_REQUIREMENT: length > 3';
+  // }
   if (!social) {
     if (userInfo.password.length < 7) {
       msg = 'PASSWORD_NOT_VALID';

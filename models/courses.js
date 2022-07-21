@@ -2,12 +2,13 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { whereAnd, whereAnd2 } = require('./util');
 
-async function readClassesList(pageNum, level, price, sort) {
+async function readClassesList(pageNum, level, price, sort, search) {
   const start = (pageNum - 1) * 16;
   const condition = {
     'classes.level_id': level,
     'classes.price': price,
   };
+
   const query = `
 SELECT
     classes.id,
@@ -30,12 +31,19 @@ FROM classes
     Join category c1 on c1.id = classes.category1_id
     Join category c2 on c2.id = classes.category2_id
     Join category c3 on c3.id = classes.category3_id
-${whereAnd(condition)}
+${whereAnd(condition)} 
 ${sort === 'famous' ? `order by students DESC ` : ``}
 ${sort === 'rating' ? `order by rate DESC` : ``}
 ${sort === 'default' ? `` : ``}
+${search && (level || price) ? `AND classes.class_name LIKE '%${search}%'` : ``}
 ${start ? `limit ${start}, 16` : `limit 0,16`}
+
+
+
+
 `;
+  console.log(query);
+
   const classesList = await prisma.$queryRawUnsafe(query);
 
   return classesList;
@@ -46,7 +54,8 @@ async function readClassesListByCategory1(
   pageNum,
   level,
   price,
-  sort
+  sort,
+  search
 ) {
   var categoryID = categoryTransform1(category);
   const start = (pageNum - 1) * 16;
@@ -81,20 +90,25 @@ async function readClassesListByCategory1(
   ${sort === 'famous' ? `order by students DESC ` : ``}
   ${sort === 'rating' ? `order by rate DESC` : ``}
   ${sort === 'default' ? `` : ``}
+  ${search && (level || price) ? `AND classes.class_name LIKE '%${search}%'` : ``}
   ${start ? `limit ${start}, 16` : `limit 0,16`}
   `;
-  console.log(query);
   const classesList = await prisma.$queryRawUnsafe(query);
   return classesList;
 }
+
+
 async function readClassesListByCategory2(
   category2,
   pageNum,
   level,
   price,
-  sort
+  sort,
+  search,
+  skill
 ) {
   var categoryID2 = categoryTransform2(category2);
+  var skillID = skillTransform(skill);
   const start = (pageNum - 1) * 16;
   const condition = {
     'classes.level_id': level,
@@ -122,13 +136,14 @@ FROM classes
     Join category c2 on c2.id = classes.category2_id
     Join category c3 on c3.id = classes.category3_id
 WHERE classes.category2_id = ${categoryID2}
+${skill? ` AND classes.category3_id = ${skillID}`:``}
 ${whereAnd2(condition)}
 ${sort === 'famous' ? `order by students DESC ` : ``}
 ${sort === 'rating' ? `order by rate DESC` : ``}
 ${sort === 'default' ? `` : ``}
+${search && (level || price) ? `AND classes.class_name LIKE '%${search}%'` : ``}
 ${start ? `limit ${start}, 16` : `limit 0,16`}
 `;
-  console.log(query);
   const classesList = await prisma.$queryRawUnsafe(query);
   return classesList;
 }
@@ -169,7 +184,7 @@ function categoryTransform2(category) {
 
   return result;
 }
-async function getTotalPages(pageNum, level, price) {
+async function getTotalPages(pageNum, level, price,search) {
   const condition = {
     'classes.level_id': level,
     'classes.price': price,
@@ -182,13 +197,14 @@ async function getTotalPages(pageNum, level, price) {
     Join category c1 on c1.id = classes.category1_id
     Join category c2 on c2.id = classes.category2_id
     Join category c3 on c3.id = classes.category3_id
-${whereAnd(condition)} `;
+${whereAnd(condition)}
+${search && (level || price) ? `AND classes.class_name LIKE '%${search}%'` : ``} `;
 
   const totalPage = await prisma.$queryRawUnsafe(query);
   return totalPage;
 }
 
-async function getTotalPages1(category, level, price) {
+async function getTotalPages1(category, level, price,search) {
   var categoryID = categoryTransform1(category);
   const condition = {
     'classes.level_id': level,
@@ -203,14 +219,16 @@ async function getTotalPages1(category, level, price) {
     Join category c2 on c2.id = classes.category2_id
     Join category c3 on c3.id = classes.category3_id
     WHERE category1_id = ${categoryID}
-${whereAnd(condition)} `;
+${whereAnd(condition)}
+${search && (level || price) ? `AND classes.class_name LIKE '%${search}%'` : ``} `;
 
   const totalPage = await prisma.$queryRawUnsafe(query);
   return totalPage;
 }
 
-async function getTotalPages2(category2, level, price) {
+async function getTotalPages2(category2, level, price,search,skill) {
   var categoryID = categoryTransform2(category2);
+  var skillID = skillTransform(skill);
   const condition = {
     'classes.level_id': level,
     'classes.price': price,
@@ -224,11 +242,104 @@ async function getTotalPages2(category2, level, price) {
     Join category c2 on c2.id = classes.category2_id
     Join category c3 on c3.id = classes.category3_id
     WHERE category2_id = ${categoryID}
-${whereAnd(condition)} `;
+    ${skill? ` AND classes.category3_id = ${skillID}`:``}
+  
+${whereAnd(condition)}
+${search && (level || price) ? `AND classes.class_name LIKE '%${search}%'` : ``} `;
 
   const totalPage = await prisma.$queryRawUnsafe(query);
   return totalPage;
 }
+
+function skillTransform(skill) {
+  let result; 
+  if(skill === "javascript"){
+    result = 13; 
+  }else if (skill === "react" ){
+    result = 14 ;
+  }
+  else if (skill === "vuejs"){
+    result = 15;
+  }
+  else if (skill === "java"){
+    result =16 ;
+  }
+  else if (skill === "spring"){
+    result =17 ;
+  }
+  else if (skill === "aws" ){
+    result = 18;
+  }
+  else if (skill === "ios"){
+    result =19 ;
+  }
+  else if (skill ==="game-design" ){
+    result = 20;
+  }
+  else if (skill === "block-coding" ){
+    result =21 ;
+  }
+  else if (skill ==="information-security" ){
+    result = 22;
+  }
+  else if (skill ==="penetration-testing" ){
+    result =23 ;
+  }
+  else if (skill === "reversing" ){
+    result =24 ;
+  }
+  else if (skill ==="cloud" ){
+    result = 25;
+  }
+  else if (skill ==="network" ){
+    result = 26;
+  }
+  else if (skill === "severless" ){
+    result = 27;
+  }
+  else if (skill === "blockchain"){
+    result = 28;
+  }
+  else if (skill === "nft"){
+    result = 29;
+  }
+  else if (skill === "game-dev"){
+    result = 30;
+  }
+  else if (skill === "data-analysis" ){
+    result = 31;
+  }
+  else if (skill === "python"){
+    result = 32;
+  }
+  else if (skill === "sql"){
+    result = 33;
+  }
+  else if (skill === "machine-learning"){
+    result = 34;
+  }
+  else if (skill === "deep-learning" ){
+    result = 35;
+  }
+  else if (skill ==="keras" ){
+    result = 36;
+  }
+  else if (skill === "data-vis"){
+    result = 37;
+  }
+  else if (skill === "excel" ){
+    result = 38;
+  }
+  else if (skill === "bigdata"){
+    result = 39;
+  }
+
+  return result; 
+}
+
+
+
+
 
 module.exports = {
   readClassesList,
@@ -238,3 +349,5 @@ module.exports = {
   getTotalPages1,
   getTotalPages2,
 };
+
+
