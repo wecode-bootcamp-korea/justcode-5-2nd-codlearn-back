@@ -32,38 +32,65 @@ const validateEmail = email => {
     );
 };
 
-const isInputValid = userInfo => {
-  if (!validateEmail(userInfo.email)) {
-    const msg = `EMAIL_NOT_VALID`;
-    const error = new Error(msg);
-    error.statusCode = 400;
-    throw error;
+const isInputValid = (userInfo, social) => {
+  console.log(userInfo);
+  console.log('userInfo', userInfo);
+  let msg = null;
+  if (!userInfo) {
+    msg = 'INVALID_USER_INFO';
   }
-  if (userInfo.password.length < 7) {
-    const msg = 'PASSWORD_NOT_VALID';
+  // if (!userInfo.email || !userInfo.user_name) {
+  //   msg = 'INSUFFICENT_USER_INFO';
+  // }
+  if (!validateEmail(userInfo.email)) {
+    msg = `EMAIL_NOT_VALID`;
+  }
+  // if (userInfo?.user_name?.length < 3) {
+  //   msg = 'USER_NAME_REQUIREMENT: length > 3';
+  // }
+  if (!social) {
+    if (userInfo.password.length < 7) {
+      msg = 'PASSWORD_NOT_VALID';
+    }
+  }
+  if (msg) {
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
   }
 };
 
-const makeHash = async password => {
+const makeHashAsync = async password => {
   return await bcrypt.hash(password, 10);
+};
+
+const createToken = async userId => {
+  try {
+    const token = jwt.sign({ id: userId }, process.env.SECRET_KEY, {
+      expiresIn: '1h',
+    });
+    return token;
+  } catch (error) {
+    error.statusCode = 400;
+    error.message = 'CREATE_TOKEN_FAILED';
+    throw error;
+  }
 };
 
 const signup = async (userInfo, social) => {
   const checkEmailExist = await doesUserExist(userInfo.email);
   if (!checkEmailExist) {
-    if (!social) isInputValid(userInfo);
-    const input = {
+    isInputValid(userInfo, social);
+    const signupInput = {
       email: userInfo.email,
-      user_name: userInfo.user_name || null,
+      user_name: userInfo.user_name,
       password: !social ? bcrypt.hashSync(userInfo.password, salt) : null,
       user_img: userInfo.user_img || null,
       social: social,
     };
-    const userId = await createUser(input, social);
-    return userId;
+    const user = await createUser(signupInput);
+    console.log(`${social ? 'SOCIAL_' : ''}` + 'SIGNUP_SUCCEEDED');
+    return user.id;
   } else {
     const msg = 'SIGNUP_FAILED: EMAIL_EXIST';
     const error = new Error(msg);
@@ -73,28 +100,28 @@ const signup = async (userInfo, social) => {
 };
 
 const login = async userInfo => {
-  isInputValid(userInfo);
+  isInputValid(userInfo, false);
   const user = await readUserByEmail(userInfo.email);
   let errMsg;
-  if (user) {
-    const isValid = await bcrypt.compare(userInfo.password, user.password);
-    if (isValid) {
-      const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, {
-        expiresIn: '1h',
-      });
-      return token;
-    } else {
-      errMsg = 'EMAIL_PASSWORD_NOT_MATCH';
-    }
+
+  if (!user) {
+    errMsg = `USER_NOT_EXIST`;
+  } else if (user.social) {
+    errMsg = `SOCIAL_USER`;
   } else {
-    errMsg = 'USER_NOT_EXIST';
+    const isValid = await bcrypt.compare(userInfo.password, user.password);
+    if (!isValid) {
+      errMsg = 'EMAIL_PASSWORD_NOT_MATCH';
+    } else {
+      return await createToken(user.id);
+    }
   }
   const error = new Error(errMsg);
   error.statusCode = 500;
   throw error;
 };
 
-const getKakaoAccessToken = async code => {
+const getKakaoToken = async code => {
   const oauthTokenUrl = KAKAO_OAUTH_TOKEN_API_URL;
   try {
     const kakaoToken = await axios({
@@ -102,12 +129,14 @@ const getKakaoAccessToken = async code => {
       url: oauthTokenUrl,
       headers: {
         'Content-type': KAKAO_CONTENT_TYPE,
+        'Access-Control-Allow-Origin': '*',
       },
       params: {
         grant_type: KAKAO_GRANT_TYPE,
         client_id: KAKAO_CLIENT_ID,
         redirect_uri: KAKAO_REDIRECT_URI,
         code: code,
+        client_secret: KAKAO_CLIENT_SECRET,
       },
     });
     console.log('GET_ACCESS_TOKEN_SUCCEEDED');
@@ -125,61 +154,56 @@ const getKakaoUserInfo = async accessToken => {
       url: KAKAO_GET_USER_API_URL,
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        'Access-Control-Allow-Origin': '*',
       },
     });
-    console.log('GET_USER_INFO_SUCCEEDED');
+    console.log('GET_KAKAO_USER_INFO_SUCCEEDED');
     return userInfo;
   } catch (error) {
-    console.log('GET_USER_INFO_FAILED');
+    console.log('GET_KAKAO_USER_INFO_FAILED');
+    error.statusCode = 400;
     throw error;
   }
 };
 
-const kakaoSignup = async userInfo => {
-  await createUser(userInfo, true);
-};
-
-const getKakaoToken = async code => {
-  const kakaoToken = await getKakaoAccessToken(code);
-  const accessToken = kakaoToken.data.access_token;
-  return kakaoToken;
-};
-
 const getUserInfoByKakaoToken = async code => {
-  const kakaoToken = await getKakaoAccessToken(code);
+  const kakaoToken = await getKakaoToken(code);
   const accessToken = kakaoToken.data.access_token;
-  const refreshToken = kakaoToken.data.refresh_token;
-
   const kakaoUserInfo = await getKakaoUserInfo(accessToken);
-  const name = kakaoUserInfo.data.kakao_account.profile_nickname_needs_agreement
-    ? kakaoUserInfo.data.kakao_account.properties.nickname
-    : null;
-  const email = kakaoUserInfo.data.kakao_account.email;
-  const img = kakaoUserInfo.data.kakao_account.profile_image_needs_agreement
-    ? kakaoUserInfo.data.kakao_account.profile.profile_img_url
-    : null;
+  const kakaoAccount = kakaoUserInfo.data.kakao_account;
+  const kakaoProperties = kakaoUserInfo.data.kakao_account.properties;
+  if (!kakaoAccount.has_email || !kakaoAccount.email) {
+    const error = new Error('SIGNUP_FAILED: EMAIL_NEEDS_AGREEMENT');
+    error.statusCode = 400;
+    throw error;
+  } else {
+    const email = kakaoAccount.email;
+    const user_name = kakaoAccount.profile_nickname_needs_agreement
+      ? kakaoProperties.nickname
+      : kakaoAccount.email;
+    const user_img = kakaoAccount.profile_image_needs_agreement
+      ? kakaoAccount.profile.profile_img_url
+      : null;
 
-  const userInfo = {
-    user_name: name,
-    email: email,
-    user_img: img,
-  };
-  return userInfo;
+    const userInfo = {
+      email: email,
+      user_name: user_name,
+      user_img: user_img,
+      social: true,
+    };
+    return userInfo;
+  }
 };
 
 const kakaoLogin = async code => {
   const userInfo = await getUserInfoByKakaoToken(code);
-
   const user = await doesUserExist(userInfo.email);
   let userId;
   if (!user) userId = await signup(userInfo, true);
   if (user && user.social) userId = await readUserIdByEmail(userInfo.email);
   if (user && !user.social) userId = await transferUserToSocialUser(userInfo);
 
-  const token = jwt.sign({ id: userId }, process.env.SECRET_KEY, {
-    expiresIn: '1h',
-  });
-  return token;
+  return createToken(userId);
 };
 
 module.exports = { signup, login, kakaoLogin };

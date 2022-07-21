@@ -1,6 +1,14 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+async function readUserById(userId) {
+  const user = await prisma.$queryRaw`
+    SELECT * FROM users
+    WHERE id=${userId}
+  `;
+  return user[0];
+}
+
 async function readUserIdByEmail(email) {
   const userId = await prisma.$queryRaw`
     SELECT id FROM users
@@ -17,38 +25,38 @@ async function readUserByEmail(email) {
   return user[0];
 }
 
-async function createUser(userInfo, social) {
-  if (social) {
+async function createUser(userInfo) {
+  if (userInfo.social) {
     const query = `
       INSERT INTO users (
         email,
-        ${userInfo.user_name ? `user_name, ` : ``}
-        ${userInfo.user_img ? `user_img, ` : ``} 
+        user_name,
+        ${userInfo.user_img ? `user_img, ` : ``}
         password
       ) VALUES (
          '${userInfo.email}',
-         ${userInfo.user_name ? `${userInfo.user_name},` : ``}
+         '${userInfo.user_name}',
          ${userInfo.user_img ? `${userInfo.user_img}, ` : ``}
          NULL)
       `;
     await prisma.$queryRawUnsafe(query);
   } else {
     await prisma.$queryRaw`
-      INSERT INTO users (social, email, password)
-      VALUES (0, ${userInfo.email}, ${userInfo.password})
-    `;
+      INSERT INTO users (social, email, user_name, password)
+      VALUES (0, ${userInfo.email}, ${userInfo.user_name}, ${userInfo.password})
+  `;
   }
   const user = await prisma.$queryRaw`
     SELECT id FROM users WHERE email=${userInfo.email}
   `;
-  return user[0].id;
+  return user[0];
 }
 
 async function transferUserToSocialUser(email) {
   await prisma.$queryRawUnsafe(`
     UPDATE users SET 
       social=1,
-      password=null
+      password=NULL
     WHERE email=${email}
   `);
   const userId = await prisma.$queryRaw`
@@ -58,6 +66,7 @@ async function transferUserToSocialUser(email) {
 }
 
 module.exports = {
+  readUserById,
   readUserIdByEmail,
   readUserByEmail,
   createUser,
