@@ -3,8 +3,8 @@ const { getCartItems, addToCart, deleteFromCart } = require('../services/cart');
 const getCartItemsController = async (req, res) => {
   //const userId = req.params.id;
   const user = req.user;
-  const items = await getCartItems(user.id);
-  return res.status(200).json({ data: items });
+  const cart = await getCartItems(user.id);
+  return res.status(200).json({ data: cart });
 };
 
 const addCartItemController = async (req, res) => {

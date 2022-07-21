@@ -20,6 +20,34 @@ async function readItemByClassId(userId, classId) {
   `;
   return item;
 }
+async function getItemsArrays(userId) {
+  const items = await prisma.$queryRaw`
+    SELECT 
+      json_object(
+          'user_id',user_id,
+          'user_name',user_name,
+          'email',users.email
+          ) user,
+          json_arrayagg(
+            json_object(
+              'class_id', class_id,
+              'class_name', class_name,
+              'class_img', img,
+              'instructor_name',instructor_name,
+              'price', price,
+              'discounted_price', discounted_price,
+              'created_at', cart.created_at)) class
+    FROM cart 
+    JOIN (
+      select id as cindx, class_name, instructor_id, price, discounted_price, img from classes) classes on classes.cindx = cart.class_id
+    JOIN (
+      select id as insidx, instructor_name from instructor) instructor on classes.instructor_id=instructor.insidx
+    JOIN users on cart.user_id=users.id 
+    WHERE user_id=${userId}
+    group by user;     
+  `;
+  return items;
+}
 
 async function getItems(userId) {
   const items = await prisma.$queryRaw`

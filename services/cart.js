@@ -6,6 +6,8 @@ const {
   addItem,
 } = require('../models/cart');
 
+const { readUserInfoShortById } = require('../models/user');
+
 const errMsg = {
   classNotFound: 'CLASS_NOT_FOUND',
   classExist: 'CLASS_EXIST',
@@ -27,8 +29,9 @@ const doesNotExist = async (userId, classList) => {
 };
 
 const getCartItems = async userId => {
+  const user = await readUserInfoShortById(userId);
   const items = await getItems(userId);
-  return items;
+  return items.length > 0 ? items : user;
 };
 
 const addToCart = async (userId, classId) => {
