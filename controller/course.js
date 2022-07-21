@@ -48,8 +48,7 @@ const getComment = async (req,res) => {
 
 const deleteComment = async(req,res)=> {
   try{
-    const {review_id} = req.body; 
-    console.log(review_id);
+    const {review_id} = req.body;
     await deleteCommentById(review_id);
     res.status(201).json({ message: 'comment deleted successfully' });
   }catch(err){
