@@ -100,15 +100,16 @@ async function addItem(userId, classId) {
 }
 
 async function deleteItem(userId, classId) {
-  await prisma.$queryRaw`
+  await prisma.$queryRawUnsafe(`
     DELETE FROM cart
     WHERE user_id=${userId} and class_id=${classId}
-  `;
+  `);
 }
 
 module.exports = {
   readClassIds,
   getItems,
+  getItemsArrays,
   readItemByClassId,
   deleteItem,
   addItem,

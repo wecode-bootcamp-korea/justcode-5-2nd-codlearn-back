@@ -26,6 +26,7 @@ const deleteCartItemController = async (req, res) => {
   //const userId = req.params.id;
   const user = req.user;
   const tempClassList = req.query.classId;
+  console.log('tempClassList', tempClassList);
   let arr = [];
   let classList = [];
   if (Array.isArray(tempClassList)) {
@@ -33,8 +34,10 @@ const deleteCartItemController = async (req, res) => {
       arr = [...arr, { class_id: Number(el) }];
     });
     classList = Array.from(new Set(arr));
+    console.log('classList', classList);
   } else {
     classList = [{ class_id: Number(tempClassList) }];
+    console.log('classList', classList);
   }
   await deleteFromCart(user.id, classList);
   // const promiseResult = classList.map(async (classId) => {

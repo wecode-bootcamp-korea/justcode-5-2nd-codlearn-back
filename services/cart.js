@@ -1,5 +1,6 @@
 const {
   readClassIds,
+  getItemsArrays,
   getItems,
   readItemByClassId,
   deleteItem,
@@ -30,8 +31,9 @@ const doesNotExist = async (userId, classList) => {
 
 const getCartItems = async userId => {
   const user = await readUserInfoShortById(userId);
-  const items = await getItems(userId);
-  return items.length > 0 ? items : user;
+  const items = await getItemsArrays(userId);
+  //return items.length > 0 ? items : user;
+  return items;
 };
 
 const addToCart = async (userId, classId) => {
