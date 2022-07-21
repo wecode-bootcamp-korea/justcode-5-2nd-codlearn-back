@@ -8,7 +8,7 @@ const FRONT_REDIRECT_URL = process.env.FRONT_REDIRECT_URL;
 
 const signupController = async (req, res) => {
   const userInfo = req.body;
-  await signup(userInfo);
+  await signup(userInfo, false);
   return res.status(201).json({ message: 'SIGNUP_SUCCEEDED' });
 };
 
@@ -29,26 +29,15 @@ const requestKaKaoAuthController = async (req, res) => {
   res.redirect(requestURL);
 };
 
-const kakaoTokenController = async (req, res) => {
-  const code = req.query.code;
-  const kakaoToken = await kakaoLogin(code);
-  const accessToken = kakaoToken.data.access_token;
-  let encodedToken = encodeURIComponent(accessToken);
-  res.redirect(`${userInfo}/?token=${accessToken}`);
-};
-
-const kakaoUserInfoController = async (req, res) => {
-  const userInfo = req.body;
-};
-
 const kakaoLoginController = async (req, res) => {
   const code = req.query.code;
   const token = await kakaoLogin(code);
   if (token) {
     console.log('token to front: ', token);
-    res.redirect(`${FRONT_REDIRECT_URL}/?token=${token}`);
+    const searchParams = new URLSearchParams({ token: token }).toString();
+    res.redirect(`${FRONT_REDIRECT_URL}/?${searchParams}`);
   } else {
-    const error = new Error('KAKAO_TOKEN_INVALID');
+    const error = new Error('REQUEST_KAKAO_TOKEN_FAILED');
     error.statusCode = 400;
     throw error;
   }
