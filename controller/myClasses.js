@@ -39,10 +39,10 @@ const isInputValid = (input, str) => {
 };
 
 const getMyClassItemsController = async (req, res) => {
-  const userId = req.user;
+  const user = req.user;
   const sort = req.query.sort;
-  if (isInputValid(userId, 'userId') && isInputValid(sort, 'sort')) {
-    const items = await getMyClassItems(userId, sort);
+  if (isInputValid(user.id, 'userId') && isInputValid(sort, 'sort')) {
+    const items = await getMyClassItems(user.id, sort);
     return res.status(200).json({ data: items });
   } else {
     const msg = 'INVALID_INPUT: userId, sort option NOT VALID';
@@ -53,10 +53,10 @@ const getMyClassItemsController = async (req, res) => {
 };
 
 const addMyClassItemsController = async (req, res) => {
-  const userId = req.user;
+  const user = req.user;
   const classList = req.body;
   if (isClassListInputValid(classList, 'classList')) {
-    await addToMyClass(userId, classList);
+    await addToMyClass(user.id, classList);
     return res.status(201).json({ message: 'class added into my classes' });
   } else {
     const msg = 'INVALID_INPUT: classList is NOT VALID';
@@ -67,7 +67,7 @@ const addMyClassItemsController = async (req, res) => {
 };
 
 const deleteMyClassItemController = async (req, res) => {
-  const userId = req.user;
+  const user = req.user;
   const tempClassList = req.query.classId;
   let arr = [];
   let classList = [];
@@ -79,20 +79,20 @@ const deleteMyClassItemController = async (req, res) => {
   } else {
     classList = [{ class_id: Number(tempClassList) }];
   }
-  await deleteFromMyClass(userId, classList);
+  await deleteFromMyClass(user.id, classList);
   return res.status(201).json({ message: 'class deleted from cart' });
 };
 
 const updateMyClassItemsController = async (req, res) => {
-  const userId = req.user;
+  const user = req.user;
   const classId = req.query.classId;
   const progress = req.query.progress;
   if (
-    isInputValid(userId, 'userId') &&
+    isInputValid(user.id, 'userId') &&
     isInputValid(classId, 'classId') &&
     isInputValid(progress, 'progress')
   ) {
-    await updateProgressOfMyClass(userId, classId, progress);
+    await updateProgressOfMyClass(user.id, classId, progress);
     return res.status(201).json({ message: 'progress updated ' });
   } else {
     const msg =
