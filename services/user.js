@@ -44,7 +44,7 @@ const isInputValid = (userInfo, social) => {
   if (!validateEmail(userInfo.email)) {
     msg = `EMAIL_NOT_VALID`;
   }
-  if (userInfo.user_name.length < 3) {
+  if (userInfo?.user_name?.length < 3) {
     msg = 'USER_NAME_REQUIREMENT: length > 3';
   }
   if (!social) {
