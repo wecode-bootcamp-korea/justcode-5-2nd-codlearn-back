@@ -29,23 +29,26 @@ const isInputValid = (input, str) => {
     ) {
       console.log(`INVALID_INPUT: ${input} is not valid sort option.`);
       return false;
+    } else {
+      if (input.split(',') > 1 || typeof input !== 'string') {
+        console.log(`INVALID_INPUT: ${str} = ${input}`);
+        return false;
+      }
     }
   }
-  if (input.includes(',') || typeof input !== 'string') {
-    console.log(`INVALID_INPUT: ${str} = ${input}`);
-    return false;
-  }
+
   return true;
 };
 
 const getMyClassItemsController = async (req, res) => {
   const user = req.user;
-  const sort = req.query.sort;
-  if (isInputValid(user.id, 'userId') && isInputValid(sort, 'sort')) {
+  const searchParams = new URLSearchParams(req.query);
+  const sort = searchParams.get('sort');
+  if (isInputValid(sort, 'sort')) {
     const items = await getMyClassItems(user.id, sort);
     return res.status(200).json({ data: items });
   } else {
-    const msg = 'INVALID_INPUT: userId, sort option NOT VALID';
+    const msg = 'INVALID_INPUT: sort option NOT VALID';
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
@@ -87,11 +90,7 @@ const updateMyClassItemsController = async (req, res) => {
   const user = req.user;
   const classId = req.query.classId;
   const progress = req.query.progress;
-  if (
-    isInputValid(user.id, 'userId') &&
-    isInputValid(classId, 'classId') &&
-    isInputValid(progress, 'progress')
-  ) {
+  if (isInputValid(classId, 'classId') && isInputValid(progress, 'progress')) {
     await updateProgressOfMyClass(user.id, classId, progress);
     return res.status(201).json({ message: 'progress updated ' });
   } else {

@@ -10,9 +10,16 @@ const getCartItemsController = async (req, res) => {
 const addCartItemController = async (req, res) => {
   //const userId = req.params.id;
   const user = req.user;
+  const searchParams = new URLSearchParams(req.query);
   const classId = req.query.classId;
-  await addToCart(user.id, classId);
-  return res.status(201).json({ message: 'item added into cart' });
+  if (searchParams.get('classId').split(',').length > 1) {
+    const error = new Error('INVALID_INPUT: ADD ONE BY ONE');
+    error.statusCode = 400;
+    throw error;
+  } else {
+    await addToCart(user.id, classId);
+    return res.status(201).json({ message: 'item added into cart' });
+  }
 };
 
 const deleteCartItemController = async (req, res) => {
