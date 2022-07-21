@@ -39,7 +39,7 @@ const isInputValid = (input, str) => {
 };
 
 const getMyClassItemsController = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.user;
   const sort = req.query.sort;
   if (isInputValid(userId, 'userId') && isInputValid(sort, 'sort')) {
     const items = await getMyClassItems(userId, sort);
@@ -53,7 +53,7 @@ const getMyClassItemsController = async (req, res) => {
 };
 
 const addMyClassItemsController = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.user;
   const classList = req.body;
   if (isClassListInputValid(classList, 'classList')) {
     await addToMyClass(userId, classList);
@@ -67,7 +67,7 @@ const addMyClassItemsController = async (req, res) => {
 };
 
 const deleteMyClassItemController = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.user;
   const tempClassList = req.query.classId;
   let arr = [];
   let classList = [];
@@ -84,7 +84,7 @@ const deleteMyClassItemController = async (req, res) => {
 };
 
 const updateMyClassItemsController = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.user;
   const classId = req.query.classId;
   const progress = req.query.progress;
   if (

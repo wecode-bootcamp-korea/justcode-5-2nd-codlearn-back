@@ -12,10 +12,13 @@ const verifyToken = async (req, res, next) => {
     if (!user) {
       res.status(401).send('Unauthorized');
     } else {
+      req.token = token;
+      req.user = user;
       next();
     }
-  } catch (e) {
-    res.status(401).send('Unauthorized');
+  } catch (error) {
+    res.status(error.statusCode || 400).json({ message: error.message });
+    next(error);
   }
 };
 

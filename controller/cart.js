@@ -1,25 +1,28 @@
 const { getCartItems, addToCart, deleteFromCart } = require('../services/cart');
 
 const getCartItemsController = async (req, res) => {
-  const userId = req.params.id;
+  //const userId = req.params.id;
+  const userId = req.user;
   const items = await getCartItems(userId);
   return res.status(200).json({ data: items });
 };
 
 const addCartItemController = async (req, res) => {
-  const userId = req.params.id;
+  //const userId = req.params.id;
+  const userId = req.user;
   const classId = req.query.classId;
   await addToCart(userId, classId);
   return res.status(201).json({ message: 'item added into cart' });
 };
 
 const deleteCartItemController = async (req, res) => {
-  const userId = req.params.id;
+  //const userId = req.params.id;
+  const userId = req.user;
   const tempClassList = req.query.classId;
   let arr = [];
   let classList = [];
   if (Array.isArray(tempClassList)) {
-    tempClassList.map((el) => {
+    tempClassList.map(el => {
       arr = [...arr, { class_id: Number(el) }];
     });
     classList = Array.from(new Set(arr));
