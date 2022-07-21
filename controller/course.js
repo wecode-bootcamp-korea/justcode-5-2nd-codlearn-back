@@ -26,9 +26,7 @@ const writeComment = async (req,res) => {
 
 const getComment = async (req,res) => {
   try{
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-    const userId = decodedToken.id;
+    const userId = req.user.id;
     const titleId = req.params.title; 
     const review = await getCommentsById(titleId);
 
