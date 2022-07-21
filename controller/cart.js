@@ -23,27 +23,9 @@ const addCartItemController = async (req, res) => {
 };
 
 const deleteCartItemController = async (req, res) => {
-  //const userId = req.params.id;
   const user = req.user;
-  const tempClassList = req.query.classId;
-  console.log('tempClassList', tempClassList);
-  let arr = [];
-  let classList = [];
-  if (Array.isArray(tempClassList)) {
-    tempClassList.map(el => {
-      arr = [...arr, { class_id: Number(el) }];
-    });
-    classList = Array.from(new Set(arr));
-    console.log('classList', classList);
-  } else {
-    classList = [{ class_id: Number(tempClassList) }];
-    console.log('classList', classList);
-  }
+  const classList = req.body;
   await deleteFromCart(user.id, classList);
-  // const promiseResult = classList.map(async (classId) => {
-  //   await deleteFromCart(userId, classId); //전역에러 처리됨
-  // });
-  // await Promise.all(promiseResult); // wait for promiseResult to be done
   return res.status(201).json({ message: 'item deleted from cart' });
 };
 
