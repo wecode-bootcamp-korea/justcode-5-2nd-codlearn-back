@@ -1,6 +1,14 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+async function readUserInfoShortById(userId) {
+  const user = await prisma.$queryRaw`
+    SELECT id, user_name, email FROM users
+    WHERE id=${userId}
+  `;
+  return user[0];
+}
+
 async function readUserById(userId) {
   const user = await prisma.$queryRaw`
     SELECT * FROM users
@@ -66,6 +74,7 @@ async function transferUserToSocialUser(email) {
 }
 
 module.exports = {
+  readUserInfoShortById,
   readUserById,
   readUserIdByEmail,
   readUserByEmail,

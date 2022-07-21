@@ -1,10 +1,13 @@
 const {
   readClassIds,
+  getItemsArrays,
   getItems,
   readItemByClassId,
   deleteItem,
   addItem,
 } = require('../models/cart');
+
+const { readUserInfoShortById } = require('../models/user');
 
 const errMsg = {
   classNotFound: 'CLASS_NOT_FOUND',
@@ -27,7 +30,9 @@ const doesNotExist = async (userId, classList) => {
 };
 
 const getCartItems = async userId => {
-  const items = await getItems(userId);
+  const user = await readUserInfoShortById(userId);
+  const items = await getItemsArrays(userId);
+  //return items.length > 0 ? items : user;
   return items;
 };
 
@@ -47,8 +52,8 @@ const addToCart = async (userId, classId) => {
 const deleteFromCart = async (userId, classList) => {
   const classNotExist = await doesNotExist(userId, classList);
   if (classNotExist.length === 0) {
-    classList.forEach(async classId => {
-      await deleteItem(userId, classId);
+    classList.forEach(async el => {
+      await deleteItem(userId, el.class_id);
     });
   } else {
     console.log('class is not in cart');
