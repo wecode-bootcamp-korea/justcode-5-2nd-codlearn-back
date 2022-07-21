@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const asyncWrap = require('../async-wrap');
 const router = Router();
+const { verifyToken } = require('../middleware/auth');
 
 const {
   getMyClassItemsController,
@@ -9,9 +10,10 @@ const {
   updateMyClassItemsController,
 } = require('../controller/myClasses');
 
-router.get('/:id', asyncWrap(getMyClassItemsController));
-router.post('/:id', asyncWrap(addMyClassItemsController));
-router.patch('/update/:id', asyncWrap(updateMyClassItemsController));
-router.delete('/:id', asyncWrap(deleteMyClassItemController));
+router.use(verifyToken);
+router.get('/', verifyToken, asyncWrap(getMyClassItemsController));
+router.put('/', verifyToken, asyncWrap(addMyClassItemsController));
+router.patch('/update/', verifyToken, asyncWrap(updateMyClassItemsController));
+router.delete('/', verifyToken, asyncWrap(deleteMyClassItemController));
 
 module.exports = router;

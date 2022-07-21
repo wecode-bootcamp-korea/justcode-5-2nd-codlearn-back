@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const asyncWrap = require('../async-wrap');
 const router = Router();
+const { verifyToken } = require('../middleware/auth');
 
 const {
   getwishListItemsController,
@@ -8,8 +9,9 @@ const {
   deleteWishListItemController,
 } = require('../controller/wishlist');
 
-router.get('/:id', asyncWrap(getwishListItemsController));
-router.put('/:id', asyncWrap(addWishListItemController));
-router.delete('/:id', asyncWrap(deleteWishListItemController));
+router.use(verifyToken);
+router.get('/', verifyToken, asyncWrap(getwishListItemsController));
+router.put('/', verifyToken, asyncWrap(addWishListItemController));
+router.delete('/', verifyToken, asyncWrap(deleteWishListItemController));
 
 module.exports = router;
