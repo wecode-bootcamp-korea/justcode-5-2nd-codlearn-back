@@ -57,7 +57,6 @@ const deleteFromCart = async (userId, classList) => {
       console.log('item deleted from cart');
     });
   } else {
-    console.log('class is not in cart');
     const msg = 'CLASS_NOT_FOUND: class_id: ' + JSON.stringify(classNotExist);
     const error = new Error(msg);
     error.statusCode = 400;

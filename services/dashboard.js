@@ -41,7 +41,6 @@ const getDashBoardItems = async userId => {
   if (isCartNotEmpty(userId)) {
     cart = { cart: await getCartItem(userId, limit) };
   }
-  console.log('cart for dash ', cart);
   const result = Object.assign(
     ...user,
     recentlyRegistered,

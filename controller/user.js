@@ -19,7 +19,7 @@ const kakaoLoginController = async (req, res) => {
   const code = req.query.code;
   const token = await kakaoLogin(code);
   if (token) {
-    console.log('token to front: ', token);
+    console.log('token: ', token);
     const searchParams = new URLSearchParams({ token: token }).toString();
     res.redirect(`${FRONT_REDIRECT_URL}/?${searchParams}`);
   } else {
