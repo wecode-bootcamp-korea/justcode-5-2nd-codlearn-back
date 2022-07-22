@@ -117,7 +117,7 @@ const login = async userInfo => {
     } else {
       console.log('CODLEARN_LOGIN_SUCCEEDED');
       const token = await createToken(user.id);
-      console.log('CODLEARN_LOGIN_TOKEN_GENERATATED');
+      console.log('CODLEARN_LOGIN_TOKEN_GENERATED');
       return token;
     }
   }
@@ -215,7 +215,7 @@ const kakaoLogin = async code => {
   if (user && user.social) userId = await readUserIdByEmail(userInfo.email);
   console.log('SOCIAL_LOGIN_SUCCEEDED');
   const token = await createToken(userId);
-  console.log('CODLEARN_LOGIN_TOKEN_GENERATATED');
+  console.log('CODLEARN_LOGIN_TOKEN_GENERATED');
   return token;
 };
 
