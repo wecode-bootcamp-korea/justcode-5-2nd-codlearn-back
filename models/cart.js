@@ -49,12 +49,11 @@ async function getItemsArrays(userId) {
   return items;
 }
 
-async function getItems(userId) {
+async function getItems(userId, limit) {
+  if (!limit) limit = 100;
   const items = await prisma.$queryRaw`
     SELECT
-      id,
-      user_name,
-      email,
+      class_id,
       class_name,
       img as class_img,
       instructor_name,
@@ -85,7 +84,7 @@ async function getItems(userId) {
         ) users ON cart.user_id = users.useridx
       ) as t
     WHERE t.user_id = ${userId}
-    ORDER BY created_at DESC;        
+    ORDER BY created_at DESC limit ${limit};        
   `;
   return items;
 }
