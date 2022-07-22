@@ -6,7 +6,6 @@ const {
 } = require('../services/myClasses');
 
 const isClassListInputValid = (classList, str) => {
-  console.log('isClassValid: ', str, ' ', classList);
   if (classList == null || classList.length === 0 || classList === '') {
     console.log(`INVALID_INPUT: classId=undefined or null`);
     return false;

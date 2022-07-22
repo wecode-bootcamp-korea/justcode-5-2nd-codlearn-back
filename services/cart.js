@@ -54,6 +54,7 @@ const deleteFromCart = async (userId, classList) => {
   if (classNotExist.length === 0) {
     classList.forEach(async el => {
       await deleteItem(userId, el.class_id);
+      console.log('item deleted from cart');
     });
   } else {
     console.log('class is not in cart');

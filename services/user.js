@@ -33,8 +33,7 @@ const validateEmail = email => {
 };
 
 const isInputValid = (userInfo, social, option) => {
-  console.log(userInfo);
-  console.log('userInfo', userInfo);
+  console.log('userInfo: ', userInfo);
   let msg = null;
   if (!userInfo) {
     msg = 'INVALID_USER_INFO';
@@ -118,6 +117,7 @@ const login = async userInfo => {
       console.log('CODLEARN_LOGIN_SUCCEEDED');
       const token = await createToken(user.id);
       console.log('CODLEARN_LOGIN_TOKEN_GENERATED');
+      console.log('token: ', token);
       return token;
     }
   }
