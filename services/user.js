@@ -32,30 +32,29 @@ const validateEmail = email => {
     );
 };
 
-const isInputValid = (userInfo, social) => {
+const isInputValid = (userInfo, social, option) => {
   console.log(userInfo);
   console.log('userInfo', userInfo);
   let msg = null;
   if (!userInfo) {
     msg = 'INVALID_USER_INFO';
   }
-  // if (!userInfo.email || !userInfo.user_name) {
-  //   msg = 'INSUFFICENT_USER_INFO';
-  // }
+
   if (!validateEmail(userInfo.email)) {
     msg = `EMAIL_NOT_VALID`;
   }
-  // if (userInfo?.user_name?.length < 3) {
-  //   msg = 'USER_NAME_REQUIREMENT: length > 3';
-  // }
+
   if (!social) {
     if (userInfo.password.length < 7) {
       msg = 'PASSWORD_NOT_VALID';
     }
+  }
+  if (option === 'signup') {
     if (userInfo.user_name == null || userInfo.user_name?.length < 2) {
       msg = 'USER_NAME_REQUIRED. user_name.length > 1';
     }
   }
+
   if (msg) {
     const error = new Error(msg);
     error.statusCode = 400;
@@ -83,7 +82,7 @@ const createToken = async userId => {
 const signup = async (userInfo, social) => {
   const checkEmailExist = await doesUserExist(userInfo.email);
   if (!checkEmailExist) {
-    isInputValid(userInfo, social);
+    isInputValid(userInfo, social, 'signup');
     const signupInput = {
       email: userInfo.email,
       user_name: userInfo.user_name,
@@ -103,7 +102,7 @@ const signup = async (userInfo, social) => {
 };
 
 const login = async userInfo => {
-  isInputValid(userInfo, false);
+  isInputValid(userInfo, false, 'login');
   const user = await readUserByEmail(userInfo.email);
   let errMsg;
 
@@ -118,7 +117,7 @@ const login = async userInfo => {
     } else {
       console.log('CODLEARN_LOGIN_SUCCEEDED');
       const token = await createToken(user.id);
-      console.log('CODLEARN_LOGIN_TOKEN_GENERATATED');
+      console.log('CODLEARN_LOGIN_TOKEN_GENERATED');
       return token;
     }
   }
@@ -216,7 +215,7 @@ const kakaoLogin = async code => {
   if (user && user.social) userId = await readUserIdByEmail(userInfo.email);
   console.log('SOCIAL_LOGIN_SUCCEEDED');
   const token = await createToken(userId);
-  console.log('CODLEARN_LOGIN_TOKEN_GENERATATED');
+  console.log('CODLEARN_LOGIN_TOKEN_GENERATED');
   return token;
 };
 
