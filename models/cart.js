@@ -37,7 +37,7 @@ async function getItemsArrays(userId) {
               'price', classes.price,
               'discounted_price', classes.discounted_price,
               'created_at', cart.created_at)) class
-    FROM (select * FROM cart ORDER BY created_at DESC) cart 
+    FROM (select * FROM cart ORDER BY created_at) cart 
     JOIN classes ON classes.id = cart.class_id
     JOIN instructor ON classes.instructor_id=instructor.id
     JOIN users ON cart.user_id=users.id 
