@@ -1,4 +1,10 @@
-const { signup, login, kakaoLogin } = require('../services/user');
+const {
+  signup,
+  login,
+  kakaoLogin,
+  kakaoLogout,
+  kakaoAccountLogout,
+} = require('../services/user');
 
 require('dotenv').config();
 const FRONT_REDIRECT_URL = process.env.FRONT_REDIRECT_URL;
@@ -29,8 +35,48 @@ const kakaoLoginController = async (req, res) => {
   }
 };
 
+const kakaoLogoutController = async (req, res) => {
+  const user = req.user;
+  const codlearnToken = req.token;
+  if (user.social) {
+    if (codlearnToken) {
+      const kakaoId = await kakaoLogout(codlearnToken);
+      return res.status(201).json({ message: 'KAKAO_USER_LOGOUT_SUCCEEDED' });
+    } else {
+      const error = new Error('KAKAO_USER_LOGOUT_FAILED');
+      error.statusCode = 400;
+      throw error;
+    }
+  } else {
+    return res.status(201).json({ message: 'NOT_SOCIAL_USER' });
+  }
+};
+
+const kakaoAccountLogoutController = async (req, res) => {
+  const user = req.user;
+  const codlearnToken = req.token;
+  if (user.social) {
+    console.log('user ', user);
+    console.log(codlearnToken);
+    if (codlearnToken) {
+      await kakaoAccountLogout();
+      console.log('res ', res);
+      //console.log('res location', res.location);
+      return res.status(201).json({ message: 'ACCOUNT_LOGOUT_SUCCEEDED' });
+    } else {
+      const error = new Error('KAKAO_ACCOUNT_LOGOUT_FAILED');
+      error.statusCode = 400;
+      throw error;
+    }
+  } else {
+    return res.status(201).json({ message: 'NOT_SOCIAL_USER' });
+  }
+};
+
 module.exports = {
   signupController,
   loginController,
   kakaoLoginController,
+  kakaoLogoutController,
+  kakaoAccountLogoutController,
 };
