@@ -23,28 +23,26 @@ async function readItemByClassId(userId, classId) {
 async function getItemsArrays(userId) {
   const items = await prisma.$queryRaw`
     SELECT 
-      json_object(
-          'user_id',user_id,
-          'user_name',user_name,
-          'email',users.email
+      JSON_OBJECT(
+          'user_id', cart.user_id,
+          'user_name', users.user_name,
+          'email', users.email
           ) user,
-          json_arrayagg(
-            json_object(
-              'class_id', class_id,
-              'class_name', class_name,
-              'class_img', img,
-              'instructor_name',instructor_name,
-              'price', price,
-              'discounted_price', discounted_price,
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'class_id', classes.id,
+              'class_name', classes.class_name,
+              'class_img', classes.img,
+              'instructor_name', instructor.instructor_name,
+              'price', classes.price,
+              'discounted_price', classes.discounted_price,
               'created_at', cart.created_at)) class
-    FROM cart 
-    JOIN (
-      select id as cindx, class_name, instructor_id, price, discounted_price, img from classes) classes on classes.cindx = cart.class_id
-    JOIN (
-      select id as insidx, instructor_name from instructor) instructor on classes.instructor_id=instructor.insidx
-    JOIN users on cart.user_id=users.id 
+    FROM (select * FROM cart ORDER BY created_at DESC) cart 
+    JOIN classes ON classes.id = cart.class_id
+    JOIN instructor ON classes.instructor_id=instructor.id
+    JOIN users ON cart.user_id=users.id 
     WHERE user_id=${userId}
-    group by user;     
+    GROUP BY user;   
   `;
   return items;
 }
@@ -59,30 +57,11 @@ async function getItems(userId, limit) {
       instructor_name,
       price,
       discounted_price,
-      created_at
-    FROM(
-      SELECT * FROM cart
-      JOIN(
-        SELECT 
-          id as cidx,
-          class_name,
-          instructor_id,
-          price,
-          discounted_price,
-          img FROM classes
-        ) classes ON class_id = classes.cidx
-      JOIN(
-        SELECT
-          id as insidx,
-          instructor_name FROM instructor
-        ) instructor ON classes.instructor_id = instructor.insidx
-      JOIN(
-        SELECT
-          id as useridx,
-          user_name,
-          email FROM users
-        ) users ON cart.user_id = users.useridx
-      ) as t
+      cart.created_at
+    FROM cart
+    JOIN classes ON cart.class_id = classes.id
+    JOIN instructor ON classes.instructor_id = instructor.id
+    JOIN users ON cart.user_id = users.id
     WHERE t.user_id = ${userId}
     ORDER BY created_at DESC limit ${limit};        
   `;
@@ -101,7 +80,7 @@ async function addItem(userId, classId) {
 async function deleteItem(userId, classId) {
   await prisma.$queryRawUnsafe(`
     DELETE FROM cart
-    WHERE user_id=${userId} and class_id=${classId}
+    WHERE user_id=${userId} AND class_id=${classId}
   `);
 }
 
