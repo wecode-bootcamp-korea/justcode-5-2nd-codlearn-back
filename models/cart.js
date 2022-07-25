@@ -20,7 +20,7 @@ async function readItemByClassId(userId, classId) {
   `;
   return item;
 }
-async function getItemsArrays(userId) {
+async function getItemsWithUser(userId) {
   const items = await prisma.$queryRaw`
     SELECT 
       JSON_OBJECT(
@@ -62,7 +62,7 @@ async function getItems(userId, limit) {
     JOIN classes ON cart.class_id = classes.id
     JOIN instructor ON classes.instructor_id = instructor.id
     JOIN users ON cart.user_id = users.id
-    WHERE t.user_id = ${userId}
+    WHERE user_id = ${userId}
     ORDER BY created_at DESC limit ${limit};        
   `;
   return items;
@@ -87,7 +87,7 @@ async function deleteItem(userId, classId) {
 module.exports = {
   readClassIds,
   getItems,
-  getItemsArrays,
+  getItemsWithUser,
   readItemByClassId,
   deleteItem,
   addItem,
