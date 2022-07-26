@@ -73,6 +73,26 @@ async function transferUserToSocialUser(email) {
   return userId[0].id;
 }
 
+async function storeToken(token) {
+  await prisma.$queryRaw`
+    INSERT INTO token (codlearn_token, kakao_token) VALUES 
+    (${token.codlearnToken}, ${token.kakaoToken})
+  `;
+}
+
+async function removeToken(codlearnToken) {
+  await prisma.$queryRaw`
+    DELETE FROM token WHERE codlearn_token=${codlearnToken}
+  `;
+}
+
+async function readToken(codlearnToken) {
+  const kakaoToken = await prisma.$queryRaw`
+    SELECT kakao_token FROM token WHERE codlearn_token=${codlearnToken}
+  `;
+  return kakaoToken.length > 0 ? kakaoToken[0].kakao_token : null;
+}
+
 module.exports = {
   readUserInfoShortById,
   readUserById,
@@ -80,4 +100,7 @@ module.exports = {
   readUserByEmail,
   createUser,
   transferUserToSocialUser,
+  storeToken,
+  removeToken,
+  readToken,
 };

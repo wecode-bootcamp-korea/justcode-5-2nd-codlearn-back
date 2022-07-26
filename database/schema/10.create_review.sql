@@ -5,6 +5,8 @@ CREATE TABLE review (
 	rate float not null,
 	class_id int not null,
 	review_content text, 
+	created_at DATETIME DEFAULT NOW(),
+  updated_at DATETIME,
 	primary key (id),
 	FOREIGN key (user_id) references users(id),
 	FOREIGN key (class_id) references classes(id),

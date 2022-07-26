@@ -8,16 +8,28 @@ const {
   readUserByEmail,
   createUser,
   transferUserToSocialUser,
+  storeToken,
+  removeToken,
+  readToken,
 } = require('../models/user');
 
 require('dotenv').config();
+const KAKAO_OAUTH_URL = 'https://kauth.kakao.com/oauth';
 const KAKAO_OAUTH_TOKEN_API_URL = 'https://kauth.kakao.com/oauth/token';
+const KAKAO_OAUTH_LOGOUT_API_URL = 'https://kauth.kakao.com/oauth/logout';
 const KAKAO_GET_USER_API_URL = 'https://kapi.kakao.com/v2/user/me';
+const KAKAO_LOGOUT_URL = 'https://kapi.kakao.com/v1/user/logout';
 const KAKAO_GRANT_TYPE = 'authorization_code';
 const KAKAO_CONTENT_TYPE = 'application/x-www-form-urlencoded;charset=utf-8';
 const KAKAO_CLIENT_ID = process.env.REST_API_KEY;
 const KAKAO_REDIRECT_URI = process.env.REDIRECT_URI;
 const KAKAO_CLIENT_SECRET = process.env.CLIENT_SECRET;
+const FRONT_REDIRECT_URL = process.env.FRONT_REDIRECT_URL;
+
+let tokenObj = {
+  codlearnToken: '',
+  kakaoToken: '',
+};
 
 const doesUserExist = async email => {
   const user = await readUserByEmail(email);
@@ -127,11 +139,10 @@ const login = async userInfo => {
 };
 
 const getKakaoToken = async code => {
-  const oauthTokenUrl = KAKAO_OAUTH_TOKEN_API_URL;
   try {
     const kakaoToken = await axios({
       method: 'POST',
-      url: oauthTokenUrl,
+      url: KAKAO_OAUTH_TOKEN_API_URL,
       headers: {
         'Content-type': KAKAO_CONTENT_TYPE,
         'Access-Control-Allow-Origin': '*',
@@ -174,6 +185,7 @@ const getKakaoUserInfo = async accessToken => {
 const getUserInfoByKakaoToken = async code => {
   const kakaoToken = await getKakaoToken(code);
   const accessToken = kakaoToken.data.access_token;
+  tokenObj.kakaoToken = accessToken;
   const kakaoUserInfo = await getKakaoUserInfo(accessToken);
   const kakaoAccount = kakaoUserInfo.data.kakao_account;
   const kakaoProperties = kakaoUserInfo.data.properties;
@@ -216,7 +228,68 @@ const kakaoLogin = async code => {
   console.log('SOCIAL_LOGIN_SUCCEEDED');
   const token = await createToken(userId);
   console.log('CODLEARN_LOGIN_TOKEN_GENERATED');
+  tokenObj.codlearnToken = token;
+  await tokenToDB(tokenObj);
   return token;
 };
 
-module.exports = { signup, login, kakaoLogin };
+const kakaoAccountLogout = async () => {
+  const paramsObj = {
+    client_id: KAKAO_CLIENT_ID,
+    logout_redirect_uri: FRONT_REDIRECT_URL,
+  };
+  const searchParams = new URLSearchParams(paramsObj).toString();
+  const requestURL = `${KAKAO_OAUTH_LOGOUT_API_URL}/?${searchParams}`;
+  try {
+    const result = await axios.get(requestURL);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const kakaoLogout = async codlearnToken => {
+  try {
+    const accessToken = await readToken(codlearnToken);
+    const kakaoId = await axios({
+      method: 'POST',
+      url: KAKAO_LOGOUT_URL,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Bearer ${accessToken}`,
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+    console.log('GET_KAKAO_ID');
+    console.log('kakao id: ', kakaoId.data);
+    console.log('GET_KAKAO_ID_SUCCEEDED');
+    //console.log('call kakaoAccountLogout');
+    //await kakaoAccountLogout();
+    await terminateToken(codlearnToken);
+    console.log('TOKEN_TERMINATE_SUCCEEDED');
+  } catch (error) {
+    console.log('LOGOUT FAILED');
+    throw error;
+  }
+};
+
+const terminateToken = async codlearnToken => {
+  const tokenExist = await readToken(codlearnToken);
+  if (tokenExist) {
+    await removeToken(tokenObj.codlearnToken);
+  }
+};
+
+const tokenToDB = async tokenObj => {
+  try {
+    console.log('STORE_TOKEN');
+    console.log('token: ', tokenObj);
+    await storeToken(tokenObj);
+    setTimeout(async () => {
+      await terminateToken(tokenObj.codlearnToken);
+    }, 1000 * 60 * 60);
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = { signup, login, kakaoLogin, kakaoLogout, kakaoAccountLogout };

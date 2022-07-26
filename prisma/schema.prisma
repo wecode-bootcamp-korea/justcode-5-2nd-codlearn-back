@@ -52,8 +52,8 @@ model classes {
   category_categoryToclasses_category1_id category?    @relation("categoryToclasses_category1_id", fields: [category1_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_1")
   category_categoryToclasses_category2_id category?    @relation("categoryToclasses_category2_id", fields: [category2_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_2")
   category_categoryToclasses_category3_id category?    @relation("categoryToclasses_category3_id", fields: [category3_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_3")
-  instructor                              instructor   @relation(fields: [instructor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_5")
   level                                   level?       @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_4")
+  instructor                              instructor   @relation(fields: [instructor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_ibfk_5")
   cart                                    cart[]
   contents                                contents[]
   my_classes                              my_classes[]
@@ -94,24 +94,26 @@ model my_classes {
   class_id   Int
   progress   Int       @default(0)
   created_at DateTime? @default(now()) @db.DateTime(0)
-  classes    classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "my_classes_ibfk_2")
   users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "my_classes_ibfk_1")
+  classes    classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "my_classes_ibfk_2")
 
   @@index([class_id], map: "class_id")
   @@index([user_id], map: "user_id")
 }
 
 model review {
-  id             Int      @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   user_id        Int
   parent_id      Int?
-  rate           Float    @db.Float
+  rate           Float     @db.Float
   class_id       Int
-  review_content String?  @db.Text
-  classes        classes  @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_2")
-  review         review?  @relation("reviewToreview_parent_id", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_3")
-  users          users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_1")
-  other_review   review[] @relation("reviewToreview_parent_id")
+  review_content String?   @db.Text
+  created_at     DateTime? @default(now()) @db.DateTime(0)
+  updated_at     DateTime? @db.DateTime(0)
+  users          users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_1")
+  classes        classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_2")
+  review         review?   @relation("reviewToreview_parent_id", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_3")
+  other_review   review[]  @relation("reviewToreview_parent_id")
 
   @@index([class_id], map: "class_id")
   @@index([user_id], map: "user_id")
@@ -123,8 +125,8 @@ model wishlist {
   user_id    Int
   class_id   Int
   created_at DateTime? @default(now()) @db.DateTime(0)
-  classes    classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlist_ibfk_2")
   users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlist_ibfk_1")
+  classes    classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wishlist_ibfk_2")
 
   @@index([class_id], map: "class_id")
   @@index([user_id], map: "user_id")
@@ -135,9 +137,16 @@ model cart {
   user_id    Int
   class_id   Int
   created_at DateTime? @default(now()) @db.DateTime(0)
-  classes    classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cart_ibfk_2")
   users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cart_ibfk_1")
+  classes    classes   @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cart_ibfk_2")
 
   @@index([class_id], map: "class_id")
   @@index([user_id], map: "user_id")
+}
+
+model token {
+  id             Int       @id @default(autoincrement())
+  codlearn_token String    @unique(map: "codlearn_token") @db.VarChar(500)
+  kakao_token    String    @unique(map: "kakao_token") @db.VarChar(500)
+  created_at     DateTime? @default(now()) @db.DateTime(0)
 }

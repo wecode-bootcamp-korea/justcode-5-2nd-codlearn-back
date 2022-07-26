@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 async function checkTableNotEmpty(userId, table) {
   const [isNotEmpty] = await prisma.$queryRawUnsafe(`
     SELECT EXISTS (
-      SELECT 1 FROM ${table} where user_id=${userId}
+      SELECT 1 FROM ${table} WHERE user_id=${userId}
     ) dashboard;
   `);
   return /^1/.test(isNotEmpty.dashboard);
@@ -14,7 +14,9 @@ async function getUser(userId) {
   const user = await prisma.$queryRaw`
     SELECT 
       JSON_OBJECT(
-        'id', id, 'name', user_name, 'email', email
+        'id', id,
+        'name', user_name,
+        'email', email
       ) user FROM 
           users
         WHERE id=${userId};
@@ -48,24 +50,8 @@ async function getCoursesBySort(userId, sort, limit) {
   return courses;
 }
 
-async function getWishListItems(userId, limit) {
-  const items = await prisma.$queryRaw`
-    SELECT
-      wishlist.class_id,
-      classes.class_name,
-      img,
-      wishlist.created_at 
-    FROM wishlist
-    JOIN classes on wishlist.class_id = classes.id
-    WHERE wishlist.user_id=${userId}  
-    ORDER BY wishlist.created_at DESC limit ${limit}
-  `;
-  return items;
-}
-
 module.exports = {
   checkTableNotEmpty,
   getUser,
   getCoursesBySort,
-  getWishListItems,
 };

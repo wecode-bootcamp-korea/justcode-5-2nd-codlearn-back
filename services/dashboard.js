@@ -2,10 +2,9 @@ const { checkTableNotEmpty } = require('../models/common');
 const {
   getUser,
   getCoursesBySort,
-  getWishListItems,
 } = require('../models/dashboard');
 const { getItems: getCartItem } = require('../models/cart');
-
+const { getItems: getWishListItems} = require('../models/wishlist');
 const limit = 5;
 
 const isMyCourseNotEmpty = async userId => {

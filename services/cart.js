@@ -1,7 +1,6 @@
 const {
   readClassIds,
-  getItemsArrays,
-  getItems,
+  getItemsWithUser,
   readItemByClassId,
   deleteItem,
   addItem,
@@ -30,9 +29,7 @@ const doesNotExist = async (userId, classList) => {
 };
 
 const getCartItems = async userId => {
-  const user = await readUserInfoShortById(userId);
-  const items = await getItemsArrays(userId);
-  //return items.length > 0 ? items : user;
+  const items = await getItemsWithUser(userId);
   return items;
 };
 
@@ -40,8 +37,8 @@ const addToCart = async (userId, classId) => {
   const exist = await doesExist(userId, classId);
   if (!exist) {
     await addItem(userId, classId);
+    console.log('ITEM ADDED TO CART');
   } else {
-    console.log('class already in carts');
     const msg = 'CLASS_EXIST: class_id: ' + classId;
     const error = new Error(msg);
     error.statusCode = 400;
@@ -54,7 +51,7 @@ const deleteFromCart = async (userId, classList) => {
   if (classNotExist.length === 0) {
     classList.forEach(async el => {
       await deleteItem(userId, el.class_id);
-      console.log('item deleted from cart');
+      console.log('ITEM DELETED FROM CART');
     });
   } else {
     const msg = 'CLASS_NOT_FOUND: class_id: ' + JSON.stringify(classNotExist);
