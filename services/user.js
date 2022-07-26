@@ -163,45 +163,6 @@ const getKakaoToken = async code => {
   }
 };
 
-const kakaoAccountLogout = async () => {
-  const paramsObj = {
-    client_id: KAKAO_CLIENT_ID,
-    logout_redirect_uri: FRONT_REDIRECT_URL,
-  };
-  const searchParams = new URLSearchParams(paramsObj).toString();
-  const requestURL = `${KAKAO_OAUTH_LOGOUT_API_URL}/?${searchParams}`;
-  try {
-    const result = await axios.get(requestURL);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const kakaoLogout = async codlearnToken => {
-  try {
-    const accessToken = await readToken(codlearnToken);
-    const kakaoId = await axios({
-      method: 'POST',
-      url: KAKAO_LOGOUT_URL,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Bearer ${accessToken}`,
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
-    console.log('GET_KAKAO_ID');
-    console.log('kakao id: ', kakaoId.data);
-    console.log('GET_KAKAO_ID_SUCCEEDED');
-    //console.log('call kakaoAccountLogout');
-    //await kakaoAccountLogout();
-    await terminateToken(codlearnToken);
-    console.log('TOKEN_TERMINATE_SUCCEEDED');
-  } catch (error) {
-    console.log('LOGOUT FAILED');
-    throw error;
-  }
-};
-
 const getKakaoUserInfo = async accessToken => {
   try {
     const userInfo = await axios({
@@ -270,6 +231,45 @@ const kakaoLogin = async code => {
   tokenObj.codlearnToken = token;
   await tokenToDB(tokenObj);
   return token;
+};
+
+const kakaoAccountLogout = async () => {
+  const paramsObj = {
+    client_id: KAKAO_CLIENT_ID,
+    logout_redirect_uri: FRONT_REDIRECT_URL,
+  };
+  const searchParams = new URLSearchParams(paramsObj).toString();
+  const requestURL = `${KAKAO_OAUTH_LOGOUT_API_URL}/?${searchParams}`;
+  try {
+    const result = await axios.get(requestURL);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const kakaoLogout = async codlearnToken => {
+  try {
+    const accessToken = await readToken(codlearnToken);
+    const kakaoId = await axios({
+      method: 'POST',
+      url: KAKAO_LOGOUT_URL,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Bearer ${accessToken}`,
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+    console.log('GET_KAKAO_ID');
+    console.log('kakao id: ', kakaoId.data);
+    console.log('GET_KAKAO_ID_SUCCEEDED');
+    //console.log('call kakaoAccountLogout');
+    //await kakaoAccountLogout();
+    await terminateToken(codlearnToken);
+    console.log('TOKEN_TERMINATE_SUCCEEDED');
+  } catch (error) {
+    console.log('LOGOUT FAILED');
+    throw error;
+  }
 };
 
 const terminateToken = async codlearnToken => {
