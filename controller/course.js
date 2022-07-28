@@ -17,7 +17,6 @@ const readCourseDetail = async (req, res) => {
 const writeComment = async (req, res) => {
   try {
     const { class_id, content, rating } = req.body;
-    console.log(req.headers.authorization);
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
     await addComment(class_id, decodedToken.id, content, rating);
