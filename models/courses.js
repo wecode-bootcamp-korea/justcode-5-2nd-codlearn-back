@@ -42,7 +42,6 @@ ${start ? `limit ${start}, 16` : `limit 0,16`}
 
 
 `;
-  console.log(query);
 
   const classesList = await prisma.$queryRawUnsafe(query);
 
