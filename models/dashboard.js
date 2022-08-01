@@ -1,15 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function checkTableNotEmpty(userId, table) {
-  const [isNotEmpty] = await prisma.$queryRawUnsafe(`
-    SELECT EXISTS (
-      SELECT 1 FROM ${table} WHERE user_id=${userId}
-    ) dashboard;
-  `);
-  return /^1/.test(isNotEmpty.dashboard);
-}
-
 async function getUser(userId) {
   const user = await prisma.$queryRaw`
     SELECT 
@@ -43,15 +34,14 @@ async function getCoursesBySort(userId, sort, limit) {
       AND
       (progress=0 OR progress=1)
     ORDER BY 
-      CASE WHEN ${sort} = 'created_at' then my_classes.created_at end DESC,
-      CASE WHEN ${sort} = 'progress' then my_classes.progress end ASC
+      CASE WHEN ${sort} = 'created_at' THEN my_classes.created_at END DESC,
+      CASE WHEN ${sort} = 'progress' THEN my_classes.progress END ASC
     LIMIT ${limit}
   `;
   return courses;
 }
 
 module.exports = {
-  checkTableNotEmpty,
   getUser,
   getCoursesBySort,
 };

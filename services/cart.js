@@ -1,17 +1,10 @@
+const { readClassIds, readClassIdByClassId } = require('../models/common');
 const {
-  readClassIds,
   getItemsWithUser,
   readItemByClassId,
   deleteItem,
   addItem,
 } = require('../models/cart');
-
-const { readUserInfoShortById } = require('../models/user');
-
-const errMsg = {
-  classNotFound: 'CLASS_NOT_FOUND',
-  classExist: 'CLASS_EXIST',
-};
 
 const doesExist = async (userId, classId) => {
   const item = await readItemByClassId(userId, classId);
@@ -19,7 +12,7 @@ const doesExist = async (userId, classId) => {
 };
 
 const doesNotExist = async (userId, classList) => {
-  const items = await readClassIds(userId);
+  const items = await readClassIds(userId, 'cart');
   const res = classList.filter(el => {
     return !items.some(el2 => el2.class_id === el.class_id);
   });
@@ -34,16 +27,22 @@ const getCartItems = async userId => {
 };
 
 const addToCart = async (userId, classId) => {
-  const exist = await doesExist(userId, classId);
-  if (!exist) {
-    await addItem(userId, classId);
-    console.log('ITEM ADDED TO CART');
-  } else {
-    const msg = 'CLASS_EXIST: class_id: ' + classId;
+  const existInCart = await doesExist(userId, classId);
+  const existInMyclasses = await readClassIdByClassId(
+    userId,
+    classId,
+    'my_classes'
+  );
+  let msg = null;
+  if (existInCart) msg = 'CLASS_EXIST_IN_CART: class_id: ' + classId;
+  if (existInMyclasses.length !== 0)
+    msg = 'CLASS_EXIST_IN_MY_CLASSES: class_id: ' + classId;
+  if (msg !== null) {
     const error = new Error(msg);
     error.statusCode = 400;
     throw error;
   }
+  await addItem(userId, classId);
 };
 
 const deleteFromCart = async (userId, classList) => {
@@ -51,7 +50,6 @@ const deleteFromCart = async (userId, classList) => {
   if (classNotExist.length === 0) {
     classList.forEach(async el => {
       await deleteItem(userId, el.class_id);
-      console.log('ITEM DELETED FROM CART');
     });
   } else {
     const msg = 'CLASS_NOT_FOUND: class_id: ' + JSON.stringify(classNotExist);

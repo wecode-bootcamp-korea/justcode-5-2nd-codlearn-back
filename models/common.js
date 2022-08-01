@@ -8,14 +8,14 @@ async function checkTableNotEmpty(userId, table) {
   return /^1/.test(isNotEmpty[table]);
 }
 
-const readClassIds = async userId => {
-  const classIds = await prisma.$queryRaw`
+const readClassIds = async (userId, table) => {
+  const classIds = await prisma.$queryRawUnsafe(`
     SELECT
       class_id
-    FROM my_classes
+    FROM ${table}
     WHERE user_id=${userId}
     ORDER BY class_id
-  `;
+  `);
   return classIds;
 };
 

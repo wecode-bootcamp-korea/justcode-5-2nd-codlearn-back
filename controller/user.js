@@ -25,7 +25,6 @@ const kakaoLoginController = async (req, res) => {
   const code = req.query.code;
   const token = await kakaoLogin(code);
   if (token) {
-    console.log('token: ', token);
     const searchParams = new URLSearchParams({ token: token }).toString();
     res.redirect(`${FRONT_REDIRECT_URL}/?${searchParams}`);
   } else {
@@ -56,11 +55,8 @@ const kakaoAccountLogoutController = async (req, res) => {
   const user = req.user;
   const codlearnToken = req.token;
   if (user.social) {
-    console.log('user ', user);
-    console.log(codlearnToken);
     if (codlearnToken) {
       await kakaoAccountLogout();
-      console.log('res ', res);
       //console.log('res location', res.location);
       return res.status(201).json({ message: 'ACCOUNT_LOGOUT_SUCCEEDED' });
     } else {
