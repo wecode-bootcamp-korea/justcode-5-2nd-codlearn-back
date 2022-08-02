@@ -45,7 +45,6 @@ const validateEmail = email => {
 };
 
 const isInputValid = (userInfo, social, option) => {
-  console.log('userInfo: ', userInfo);
   let msg = null;
   if (!userInfo) {
     msg = 'INVALID_USER_INFO';
@@ -60,6 +59,7 @@ const isInputValid = (userInfo, social, option) => {
       msg = 'PASSWORD_NOT_VALID';
     }
   }
+  
   if (option === 'signup') {
     if (userInfo.user_name == null || userInfo.user_name?.length < 2) {
       msg = 'USER_NAME_REQUIRED. user_name.length > 1';
@@ -102,7 +102,6 @@ const signup = async (userInfo, social) => {
       social: social,
     };
     const user = await createUser(signupInput);
-    console.log(`${social ? 'SOCIAL_' : ''}` + 'SIGNUP_SUCCEEDED');
     return user.id;
   } else {
     const msg = 'SIGNUP_FAILED: EMAIL_EXIST';
@@ -126,10 +125,7 @@ const login = async userInfo => {
     if (!isValid) {
       errMsg = 'EMAIL_PASSWORD_NOT_MATCH';
     } else {
-      console.log('CODLEARN_LOGIN_SUCCEEDED');
       const token = await createToken(user.id);
-      console.log('CODLEARN_LOGIN_TOKEN_GENERATED');
-      console.log('token: ', token);
       return token;
     }
   }
@@ -155,10 +151,8 @@ const getKakaoToken = async code => {
         client_secret: KAKAO_CLIENT_SECRET,
       },
     });
-    console.log('GET_ACCESS_TOKEN_SUCCEEDED');
     return kakaoToken;
   } catch (error) {
-    console.log('GET_ACCESS_TOKEN_FAILED');
     throw error;
   }
 };
@@ -173,10 +167,8 @@ const getKakaoUserInfo = async accessToken => {
         'Access-Control-Allow-Origin': '*',
       },
     });
-    console.log('GET_KAKAO_USER_INFO_SUCCEEDED');
     return userInfo;
   } catch (error) {
-    console.log('GET_KAKAO_USER_INFO_FAILED');
     error.statusCode = 400;
     throw error;
   }
@@ -218,16 +210,15 @@ const kakaoLogin = async code => {
   let userId;
   if (!user) {
     userId = await signup(userInfo, true);
-    console.log('SOCIAL_LOGIN_SUCCEEDED');
   }
   if (user && !user.social) {
     userId = await transferUserToSocialUser(userInfo);
-    console.log('TRANSFER_USER_AS_SOCIAL_USER_SUCCEEDED');
   }
-  if (user && user.social) userId = await readUserIdByEmail(userInfo.email);
-  console.log('SOCIAL_LOGIN_SUCCEEDED');
+  if (user && user.social) {
+    userId = user.id;
+    console.log('here   ', userId, user)
+  }
   const token = await createToken(userId);
-  console.log('CODLEARN_LOGIN_TOKEN_GENERATED');
   tokenObj.codlearnToken = token;
   await tokenToDB(tokenObj);
   return token;
@@ -243,7 +234,7 @@ const kakaoAccountLogout = async () => {
   try {
     const result = await axios.get(requestURL);
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 };
 
@@ -259,15 +250,10 @@ const kakaoLogout = async codlearnToken => {
         'Access-Control-Allow-Origin': '*',
       },
     });
-    console.log('GET_KAKAO_ID');
-    console.log('kakao id: ', kakaoId.data);
-    console.log('GET_KAKAO_ID_SUCCEEDED');
     //console.log('call kakaoAccountLogout');
     //await kakaoAccountLogout();
     await terminateToken(codlearnToken);
-    console.log('TOKEN_TERMINATE_SUCCEEDED');
   } catch (error) {
-    console.log('LOGOUT FAILED');
     throw error;
   }
 };
@@ -281,8 +267,6 @@ const terminateToken = async codlearnToken => {
 
 const tokenToDB = async tokenObj => {
   try {
-    console.log('STORE_TOKEN');
-    console.log('token: ', tokenObj);
     await storeToken(tokenObj);
     setTimeout(async () => {
       await terminateToken(tokenObj.codlearnToken);

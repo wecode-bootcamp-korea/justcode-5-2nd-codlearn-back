@@ -7,7 +7,6 @@ const {
 
 const isClassListInputValid = (classList, str) => {
   if (classList == null || classList.length === 0 || classList === '') {
-    console.log(`INVALID_INPUT: classId=undefined or null`);
     return false;
   }
   return true;
@@ -15,7 +14,6 @@ const isClassListInputValid = (classList, str) => {
 
 const isInputValid = (input, str) => {
   if (input == null || input === '') {
-    console.log(`INVALID_INPUT: ${str} = undefined or null`);
     return false;
   }
   if (str === 'sort') {
@@ -26,11 +24,9 @@ const isInputValid = (input, str) => {
         input.toLowerCase() === 'created_at'
       )
     ) {
-      console.log(`INVALID_INPUT: ${input} is not valid sort option.`);
       return false;
     } else {
       if (input.split(',') > 1 || typeof input !== 'string') {
-        console.log(`INVALID_INPUT: ${str} = ${input}`);
         return false;
       }
     }
